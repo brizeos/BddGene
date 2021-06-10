@@ -114,7 +114,6 @@ public class Pane extends JPanel {
 					utils.LaunchDiff();
 					App.dao.disconnect();
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -124,7 +123,6 @@ public class Pane extends JPanel {
 
 
 
-		//TODO GERER LA DECO ET LE NEXT
 
 		this.paneNav = new Pane(30, wy-100, wx-60, 80);
 		this.paneNav.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -219,6 +217,121 @@ public class Pane extends JPanel {
 	}
 
 
+	public Pane(ArrayList<ArrayList<Table>> lsLvl) {
+		this.okay = new JButton("Valider");
+		this.btn = new JButton("Annuler");
+		
+		
+		setBounds(0, 0, 450, App.frame.getContentPane().getHeight());
+		setLayout(null);
+		setEnabled(true);
+		setVisible(true);
+		
+		
+		
+		
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(lsLvl);
+		
+		DefaultTreeModel dft = new DefaultTreeModel(root);
+		
+		JTree orga = new JTree(dft);
+		
+	//	for(Table t : lsLvl.getLstTable()) {
+		for (int i = lsLvl.size()-1 ; i >=0 ; i--) {
+			for (int j = 0; j < lsLvl.get(i).size(); j++) {
+				Table t = lsLvl.get(i).get(j);
+				
+				DefaultMutableTreeNode tmpTable = new DefaultMutableTreeNode( t.getTableName() );
+				root.add( tmpTable );
+				
+				for(String str : t.getLinkedTable()) {
+					DefaultMutableTreeNode tmpCol = new DefaultMutableTreeNode( str );
+					tmpTable.add(tmpCol);				
+					
+				}
+
+		}
+
+		orga.addTreeSelectionListener(new MyTreeSelectionListener());
+
+		orga.setCellRenderer(new MyCellIterator());
+		orga.setBounds(10, 10, App.frame.getContentPane().getWidth(), App.frame.getContentPane().getHeight());
+		orga.setFont(new Font(orga.getFont().getFamily(), Font.BOLD, 15));
+		add(orga);
+		
+		
+		
+		
+		
+		
+		
+		
+		}
+		
+		
+		
+		
+		
+		
+		this.btn.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				super.mousePressed(e);
+				
+				ViewPrincipal.getLateral().updateNbRestant();
+				
+				ViewPrincipal.getLateral().setEnabled(true);
+				ViewPrincipal.getLateral().setVisible(true);
+				
+				ViewPrincipal.getContent().setEnabled(true);
+				ViewPrincipal.getContent().setVisible(true);
+				
+				ViewPrincipal.getModif().setVisible(false);
+				ViewPrincipal.getModif().setEnabled(false);
+							
+				ViewPrincipal.getModif().repaint();
+				ViewPrincipal.getModif().revalidate();
+				
+				
+				
+			}
+		
+		});
+		this.okay.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				super.mousePressed(e);
+				getColumn().setValidated(true);
+				
+				ViewPrincipal.getLateral().updateNbRestant();
+				
+				ViewPrincipal.getLateral().setEnabled(true);
+				ViewPrincipal.getLateral().setVisible(true);
+				
+				ViewPrincipal.getContent().setEnabled(true);
+				ViewPrincipal.getContent().setVisible(true);
+				
+				ViewPrincipal.getModif().setVisible(false);
+				ViewPrincipal.getModif().setEnabled(false);
+							
+				ViewPrincipal.getModif().repaint();
+				ViewPrincipal.getModif().revalidate();
+			}
+		
+		});
+		
+		repaint();
+		revalidate();
+		App.frame.repaint();
+		App.frame.revalidate();
+		
+		
+	
+	}
+
+
 	public static void LoadCol() {
 		Pane p = ViewPrincipal.getModif();
 		p.removeAll();
@@ -274,6 +387,18 @@ public class Pane extends JPanel {
 		}
 	}
 
+	class MyCellIterator extends DefaultTreeCellRenderer
+	{
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus){
+		    super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+		    DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+		    if(node.getChildCount() == 0) {
+		      this.setDisabledIcon(this.getDefaultLeafIcon());
+		    }
+		    return this;
+		}
+	}
+	
 	public static Table getTableSelected() {
 		return tableSelected;
 	}

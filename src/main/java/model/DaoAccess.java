@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class DaoAccess {
+public class DaoAccess{
 
 	private String				strClassName = "com.mysql.cj.jdbc.Driver";
 	private String				url;
@@ -14,7 +14,7 @@ public class DaoAccess {
 	
 	private String				driver;
 	
-	private PreparedStatement	prs;
+	private PreparedStatement	prs, prs2;
 	private Connection			conn;
 	
 	// Set the constructor of DAOAccess
@@ -33,7 +33,7 @@ public class DaoAccess {
 		} 
 		catch(ClassNotFoundException e)
 		{  
-			System.err.println("Driver non chargé !");  e.printStackTrace();
+			System.err.println("Driver non chargï¿½ !");  e.printStackTrace();
 		}
 		catch (SQLException e) 
 		{
@@ -66,6 +66,20 @@ public class DaoAccess {
 	public PreparedStatement getPreparedStatement()
 	{
 		return prs;
+	}
+	
+	public void setSecond(String query) {
+		try {
+			this.prs2 = conn.prepareStatement(query);
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+	}
+	
+	public PreparedStatement getSecond()
+	{
+		return prs2;
 	}
 
 }

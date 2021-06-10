@@ -1,3 +1,4 @@
 
 *.drawio
 Docs/Wireframe.png
+/target/

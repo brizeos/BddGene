@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import javax.swing.JPanel;
 
 import com.mysql.cj.jdbc.Blob;
 
@@ -79,11 +80,10 @@ public class utils {
 			j++;
 		}
 		
-		
-		startGeneration();
+		controler.Control.LaunchViewIteration(lsLvl);
+//		startGeneration();
 	}
 
-	
 	
 	public static void startGeneration() throws SQLException {
 		System.out.println();
@@ -110,8 +110,8 @@ public class utils {
 							
 							if(cons.getPrimary().contains( tableBefore.getTableName() ) ) {
 								
-//								insertSql(t);
-								recurTable(tableBefore, i);
+								insertSql(t, tableBefore);
+								
 								t.setDone(true);
 								System.out.println(t.getTableName());
 								
@@ -124,7 +124,7 @@ public class utils {
 				}
 			}
 		} else {
-			insertSql(t);
+			insertSql(t, null);
 			System.out.println("else --- " + t.getTableName());
 			t.setDone(true);
 		}
@@ -133,7 +133,7 @@ public class utils {
 		
 	}
 	
-	public static void insertSql(Table t) throws SQLException {
+	public static void insertSql(Table t, Table before) throws SQLException {
 		
 		/**
 		 * Creation du début du sql selon le nombre de colonnes !(FK||Primary)
@@ -182,7 +182,14 @@ public class utils {
 				}
 			});
 			
-			DataStatement( i, t.getLstColumn().get(i)  );
+			if(t.getLstColumn().get(i).getIsConstrained()) {
+				recurTable(before , i);
+				DataStatement( i, t.getLstColumn().get(i)  );
+
+			}else {
+				DataStatement( i, t.getLstColumn().get(i)  );
+				
+			}
 			
 			
 		}
@@ -242,4 +249,17 @@ public class utils {
 		
 	}
 
+	
+	public static ArrayList<JPanel> showIterations(ArrayList<ArrayList<Table>> lsLvl){
+		
+		ArrayList<JPanel> lsPane = new ArrayList<JPanel>();
+		
+		
+		
+		
+		return lsPane;
+		
+	}
+	
+	
 }

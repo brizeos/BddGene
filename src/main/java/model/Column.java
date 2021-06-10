@@ -17,12 +17,14 @@ public class Column {
 	private ArrayList<Constraint> lstCons = new ArrayList<Constraint>();
 	private Faked f;
 	private String data;
-	private boolean validated;
+	private boolean validated, nullAccepted;
+	private Table table;
 	
 	
-	public Column(String name, String type, int val, boolean isPrimary, String table) throws SQLException, IOException {
+	public Column(String name, String type, int val, boolean isPrimary,boolean nullAccepted, Table table) throws SQLException, IOException {
 		super();
 		this.data = "";
+		
 		this.name = name;
 		this.type = type;
 		this.val = val;
@@ -30,10 +32,13 @@ public class Column {
 		this.isPrimary = isPrimary;
 		this.lstCons = new ArrayList<Constraint>();
 		this.setValidated(false);
+		this.setTable(table);
+		
+		
 		
 		String str = "SELECT * FROM `KEY_COLUMN_USAGE` WHERE `TABLE_NAME`= ? AND `TABLE_SCHEMA`= ? AND `COLUMN_NAME` = ? ;";
 		App.dao.setPreparedStatement(str);
-		App.dao.getPreparedStatement().setString(1, table);
+		App.dao.getPreparedStatement().setString(1, table.getTableName());
 		App.dao.getPreparedStatement().setString(2, App.getDBName());
 		App.dao.getPreparedStatement().setString(3, this.name);
 		
@@ -148,6 +153,26 @@ public class Column {
 
 	public void setValidated(boolean validated) {
 		this.validated = validated;
+	}
+
+
+	public Table getTable() {
+		return table;
+	}
+
+
+	public void setTable(Table table) {
+		this.table = table;
+	}
+
+
+	public boolean isNullAccepted() {
+		return nullAccepted;
+	}
+
+
+	public void setNullAccepted(boolean nullAccepted) {
+		this.nullAccepted = nullAccepted;
 	}
 	
 	

@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Table {
 
@@ -9,6 +10,7 @@ public class Table {
 	private boolean isConstrained, leveled, done;
 	private int nb;
 	
+	ArrayList<String> linkedTable;
 	
 	public Table() {
 		super();
@@ -16,7 +18,15 @@ public class Table {
 		this.leveled = false;
 		this.isConstrained = false;
 		this.setDone(false);
+		this.linkedTable = new ArrayList<String>();
+		/**
+		 * Fields about Iterations
+		 */
 		this.nb = 1; //TODO zero
+		
+		
+		
+	
 	}
 	
 	
@@ -93,6 +103,20 @@ public class Table {
 	}
 	public void setNb(int nb) {
 		this.nb = nb;
+	}
+
+
+
+
+	public ArrayList<String> getLinkedTable() {
+		return linkedTable;
+	}
+
+
+
+
+	public void setLinkedTable(ArrayList<String> linkedTable) {
+		this.linkedTable = linkedTable;
 	}
 
 }

@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Label;
 import java.util.ArrayList;
 
+import MavenBdd.Generator.App;
+import model.DaoAccess;
 import vue.TCustom;
 
 public class FakedNumberOption extends FakeModel {
@@ -29,21 +31,45 @@ public class FakedNumberOption extends FakeModel {
 	public void Launch() {
 		int str = 0;		
 		ArrayList<Object> lsStr = this.checkParameters();
-		switch (this.faked.getFtSec().getSelectedItem().toString().replaceAll("\"", "")) {
+		
+		if(this.getFaked().getParentCol().getIsConstrained()) {
+			this.getFaked().setData( String.valueOf( searchForConstraint()) );
+		}else {
 			
-			case "Random" : str = f.number().randomDigit();
-				break;
-			case "RandomNotZero" : str = f.number().randomDigitNotZero();
-				break;
-			case "Number Between" : str = f.number().numberBetween((int)lsStr.get(0), (int)lsStr.get(1));
-				break;
-			
+			switch (this.faked.getFtSec().getSelectedItem().toString().replaceAll("\"", "")) {
+				
+				case "Random" : str = f.number().randomDigit();
+					break;
+				case "RandomNotZero" : str = f.number().randomDigitNotZero();
+					break;
+				case "Number Between" : str = f.number().numberBetween((int)lsStr.get(0), (int)lsStr.get(1));
+					break;
+				
+			}
 		}
 		getFaked().setData( String.valueOf(str));
 
 	}
 
 	
+
+	private int searchForConstraint() {
+		int i = 0;
+
+		String sql ="";
+		
+		App.dao.setSecond(sql);
+		
+		
+		
+		
+		return i;
+	}
+
+
+
+
+
 
 	@Override
 	public void resetAll() {

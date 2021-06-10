@@ -6,12 +6,18 @@ public class Constraint {
 
 	private String fk, primary;
 
-	public Constraint(String source, String primary) {
+	private boolean simpleFk;
+
+	private Column colParent;
+	
+	public Constraint(String source, String primary, Column column) {
 		
 		this.fk = source;
 		this.primary = primary;
 		
+		this.setColParent(column);
 		
+		this.colParent.getTable().getLinkedTable().add(primary.substring(primary.indexOf(".")+1));
 		
 		
 		
@@ -31,6 +37,22 @@ public class Constraint {
 
 	public void setPrimary(String primary) {
 		this.primary = primary;
+	}
+
+	public Column getColParent() {
+		return colParent;
+	}
+
+	public void setColParent(Column colParent) {
+		this.colParent = colParent;
+	}
+
+	public boolean isSimpleFk() {
+		return simpleFk;
+	}
+
+	public void setSimpleFk(boolean simpleFk) {
+		this.simpleFk = simpleFk;
 	}
 	
 	

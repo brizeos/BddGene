@@ -253,7 +253,8 @@ public class App extends JFrame
 													    					rsBis.getString("DATA_TYPE"),
 													    					rsBis.getInt("CHARACTER_MAXIMUM_LENGTH"),
 													    					(rsBis.getString("COLUMN_KEY").equals("PRI") && rsBis.getString("COLUMN_KEY") != null? true : false),
-													    					rs.getString("TABLE_NAME") ) );
+													    					((rsBis.getString("IS_NULLABLE").equals("YES") ? true : false)),
+													    					db.getLstTable().get(i) ) );
 
 
 		    		
@@ -272,7 +273,8 @@ public class App extends JFrame
 		    			
 		    			db.getLstTable().get(i).getLstColumn().get(j).getLstCons().add(  new Constraint( 
 		    					rsCons.getString("TABLE_NAME")+"."+rsCons.getString("COLUMN_NAME") , 
-		    					rsCons.getString("REFERENCED_TABLE_NAME")+"."+rsCons.getString("REFERENCED_COLUMN_NAME")  )  );
+		    					rsCons.getString("REFERENCED_TABLE_NAME")+"."+rsCons.getString("REFERENCED_COLUMN_NAME"),
+		    					db.getLstTable().get(i).getLstColumn().get(j))  );
 		    			db.getLstTable().get(i).getLstColumn().get(j).setIsConstrained(true);
 		    			db.getLstTable().get(i).setConstrained(true);
 		    		}
