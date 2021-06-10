@@ -1,0 +1,11 @@
+{
+    "lst" : [
+        "Number"
+    ],
+    "data" : {
+        "Number" : [
+            "Random", "RandomNotZero", "Number Between"
+        ]
+        
+    }
+}
