@@ -4,21 +4,21 @@ import java.awt.Component;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import MavenBdd.Generator.App;
-import component.Faked;
+import fakery.Faked;
 
 public class Column {
 
 	private String name, type;
 	private int val;
 	private Boolean isConstrained, isPrimary;
-	private ArrayList<Constraint> lstCons = new ArrayList<Constraint>();
+//	private ArrayList<Constraint> lstCons = new ArrayList<Constraint>();
 	private Faked f;
 	private String data;
 	private boolean validated, nullAccepted;
 	private Table table;
+	private Boolean leveled;
 	
 	
 	public Column(String name, String type, int val, boolean isPrimary,boolean nullAccepted, Table table) throws SQLException, IOException {
@@ -30,7 +30,8 @@ public class Column {
 		this.val = val;
 		this.isConstrained = false;
 		this.isPrimary = isPrimary;
-		this.lstCons = new ArrayList<Constraint>();
+		this.leveled = true;
+//		this.lstCons = new ArrayList<Constraint>();
 		this.setValidated(false);
 		this.setTable(table);
 		
@@ -108,17 +109,18 @@ public class Column {
 
 	public void setIsConstrained(Boolean isConstrained) {
 		this.isConstrained = isConstrained;
+		this.leveled = false;
 	}
 
 
-	public ArrayList<Constraint> getLstCons() {
-		return lstCons;
-	}
-
-
-	public void setLstCons(ArrayList<Constraint> lstCons) {
-		this.lstCons = lstCons;
-	}
+//	public ArrayList<Constraint> getLstCons() {
+//		return lstCons;
+//	}
+//
+//
+//	public void setLstCons(ArrayList<Constraint> lstCons) {
+//		this.lstCons = lstCons;
+//	}
 
 
 	public Boolean getIsPrimary() {
@@ -174,7 +176,14 @@ public class Column {
 	public void setNullAccepted(boolean nullAccepted) {
 		this.nullAccepted = nullAccepted;
 	}
-	
+
+
+	public Boolean isLeveled() {
+		return leveled;
+	}
+	public void setLeveled(boolean bool) {
+		this.leveled = bool;
+	}
 	
 	
 	

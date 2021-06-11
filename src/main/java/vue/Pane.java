@@ -24,6 +24,9 @@ import MavenBdd.Generator.utils;
 import model.Column;
 import model.Database;
 import model.Table;
+import vue.components.Btn;
+import vue.components.DivColumn;
+import vue.components.Lab;
 
 public class Pane extends JPanel {
 
@@ -63,7 +66,9 @@ public class Pane extends JPanel {
 		setBounds(x, y , wx, wy);
 		setLayout(null);
 		
-		this.db = db;
+		this.db = db.sortByLevel();
+		
+		
 		
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode(db);
 		DefaultTreeModel dft = new DefaultTreeModel(root);
@@ -250,27 +255,27 @@ public class Pane extends JPanel {
 					
 				}
 
+			}
+	
+			orga.addTreeSelectionListener(new MyTreeSelectionI());
+	
+			orga.setCellRenderer(new MyCellIterator());
+			orga.setBounds(10, 10, App.frame.getContentPane().getWidth(), App.frame.getContentPane().getHeight());
+			orga.setFont(new Font(orga.getFont().getFamily(), Font.BOLD, 15));
+			add(orga);
+			
+		
+		
+		
+		
+		
+		
+		
 		}
-
-		orga.addTreeSelectionListener(new MyTreeSelectionListener());
-
-		orga.setCellRenderer(new MyCellIterator());
-		orga.setBounds(10, 10, App.frame.getContentPane().getWidth(), App.frame.getContentPane().getHeight());
-		orga.setFont(new Font(orga.getFont().getFamily(), Font.BOLD, 15));
-		add(orga);
 		
 		
 		
-		
-		
-		
-		
-		
-		}
-		
-		
-		
-		
+	
 		
 		
 		this.btn.addMouseListener(new MouseAdapter() {
@@ -386,7 +391,20 @@ public class Pane extends JPanel {
 		    return this;
 		}
 	}
+	
+	class MyTreeSelectionI implements TreeSelectionListener{
 
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
+			if( tmp.getUserObject() instanceof Table ) {
+				tableSelected = (Table) tmp.getUserObject();
+				ViewPrincipal.getContent().LoadIterator();
+				ViewPrincipal.getContent().repaint();
+				ViewPrincipal.getContent().revalidate();
+			}
+		}
+	}
 	class MyCellIterator extends DefaultTreeCellRenderer
 	{
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus){
@@ -402,6 +420,22 @@ public class Pane extends JPanel {
 	public static Table getTableSelected() {
 		return tableSelected;
 	}
+
+	public void LoadIterator() {
+		removeAll();
+		int i = 0;
+		
+		for(String c : tableSelected.getLinkedTable()) {
+			for (Table t : App.db.getLstTable()) {
+				if(t.getTableName().equals(c)) {
+					add( new Pane () );
+				}
+			}
+		}
+
+		
+	}
+
 
 	public static void setTableSelected(Table tableSelected) {
 		Pane.tableSelected = tableSelected;

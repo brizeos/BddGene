@@ -1,4 +1,4 @@
-package vue;
+package vue.components;
 
 import javax.swing.JLabel;
 

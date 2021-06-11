@@ -72,6 +72,95 @@ public class Database {
 		}
 		return true;
 	}
+
+
+
+	public Database sortByLevel() {
+		System.out.println(lstTable);
+
+		boolean flag = true;
+		Table tmp = null;
+		while(flag) {
+			
+			for (int indexLST=0 ; indexLST<this.lstTable.size() ; indexLST++) {
+				if ( indexLST==0 && !this.lstTable.get(indexLST).getLinkedTable().isEmpty() ) {
+					tmp = this.lstTable.get(indexLST);
+					this.lstTable.remove(indexLST);
+					this.lstTable.add( tmp);
+					
+				}else if(!this.lstTable.get(indexLST).getLinkedTable().isEmpty()) {
+					
+					int nbFk = this.lstTable.get(indexLST).getLinkedTable().size();
+					for(int indexPri=0 ; indexPri<this.lstTable.get(indexLST).getLinkedTable().size() ; indexPri++) {
+						
+						
+						for(int indexBack=0 ; indexBack<indexLST ; indexBack++) {
+							
+							if(this.lstTable.get(indexLST).getLinkedTable().get(indexPri).contains(this.lstTable.get(indexBack).getTableName())){
+								nbFk--;
+							}
+//							
+//							if(this.lstTable.get(indexBack).getTableName().equals(this.lstTable.get(indexLST).getLinkedTable().get(indexPri))){
+//								nbFk--;
+//							}
+							
+							
+						}
+						
+						
+					}
+					if(nbFk!=0) {
+						tmp = this.lstTable.get(indexLST);
+						this.lstTable.remove(indexLST);
+						this.lstTable.add(tmp);
+					}
+					
+				}else if(this.lstTable.get(indexLST).getLinkedTable().isEmpty()) {
+					
+					for(int indexBack=0 ; indexBack<indexLST ; indexBack++) {
+						if(!this.lstTable.get(indexBack).getLinkedTable().isEmpty()) {
+							tmp = this.lstTable.get(indexLST);
+							this.lstTable.remove(indexLST);
+							this.lstTable.add(indexBack,  tmp );
+						}
+					}
+				}
+				
+				
+			}
+			
+			flag = false;
+			
+			for (int indexLST=0 ; indexLST<this.lstTable.size() ; indexLST++) {
+				if ( indexLST==0 && !this.lstTable.get(indexLST).getLinkedTable().isEmpty() ) {
+					flag = true;
+				}else if(!this.lstTable.get(indexLST).getLinkedTable().isEmpty()) {
+					int nbFk = this.lstTable.get(indexLST).getLinkedTable().size();
+//					System.out.println(this.lstTable.get(indexLST));
+//					System.out.println(this.lstTable.get(indexLST).getLinkedTable());
+					for(int indexPri=0 ; indexPri<this.lstTable.get(indexLST).getLinkedTable().size() ; indexPri++) {
+						for(int indexBack=0 ; indexBack<indexLST ; indexBack++) {
+							
+							if(this.lstTable.get(indexLST).getLinkedTable().get(indexPri).contains(this.lstTable.get(indexBack).getTableName())){
+								nbFk--;
+							}
+							
+//							if(this.lstTable.get(indexBack).getTableName().contains(this.lstTable.get(indexLST).getLinkedTable().get(indexPri)))
+						}
+					}
+					if(nbFk!=0) {
+						flag =true;
+					}
+				}
+			}
+			
+			
+			
+		}
+		System.out.println(lstTable);
+		
+		return this;
+	}
 	
 	
 	

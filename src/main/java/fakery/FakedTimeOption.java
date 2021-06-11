@@ -1,10 +1,10 @@
-package component;
+package fakery;
 
 import java.awt.Label;
 import java.sql.Date;
 import java.util.ArrayList;
 
-import vue.TCustom;
+import vue.components.TCustom;
 
 public class FakedTimeOption extends FakeModel {
 

@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Table {
 
@@ -117,6 +116,17 @@ public class Table {
 
 	public void setLinkedTable(ArrayList<String> linkedTable) {
 		this.linkedTable = linkedTable;
+	}
+
+
+
+
+	public boolean isAllLeveled() {
+		for (Column c : this.lstColumn) {
+			if(!c.isLeveled()) 
+				return false;
+		}
+		return true;
 	}
 
 }

@@ -1,4 +1,4 @@
-package vue;
+package vue.components;
 
 import java.awt.Dimension;
 

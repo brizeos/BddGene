@@ -1,4 +1,4 @@
-package component;
+package fakery;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 
 import com.github.javafaker.Faker;
 
-import vue.Lab;
-import vue.TCustom;
+import vue.components.Lab;
+import vue.components.TCustom;
 
 public abstract class FakeModel extends JPanel {
 

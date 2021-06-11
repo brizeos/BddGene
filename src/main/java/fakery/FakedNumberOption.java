@@ -1,12 +1,10 @@
-package component;
+package fakery;
 
-import java.awt.Component;
 import java.awt.Label;
 import java.util.ArrayList;
 
 import MavenBdd.Generator.App;
-import model.DaoAccess;
-import vue.TCustom;
+import vue.components.TCustom;
 
 public class FakedNumberOption extends FakeModel {
 

@@ -1,4 +1,4 @@
-package vue;
+package vue.components;
 
 import java.util.ArrayList;
 import java.util.Collection;

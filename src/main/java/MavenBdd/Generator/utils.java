@@ -10,15 +10,12 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import com.mysql.cj.jdbc.Blob;
-
-import component.FakeModel;
-import component.Faked;
-import component.FakedTextOption;
+import fakery.FakeModel;
+import fakery.Faked;
 import model.Column;
-import model.Constraint;
 import model.Database;
 import model.Table;
+import sql.ResearchSql;
 import vue.ViewPrincipal;
 
 public class utils {
@@ -36,41 +33,74 @@ public class utils {
 		int i = 0;
 
 		while (flag) {
+			// Pour chaque table
 			for ( Table t : db.getLstTable()) {
+				// Si elle est contrainte par une clé étrangère
 				if(t.isConstrained() && i!=0) {
+					// Pour chacune de ces colonnes
 					for ( Column c : t.getLstColumn() ) {
+						// Si c'est une clé étrangère
 						if(c.getIsConstrained()) {
 							String toCheck = t.getTableName()+"."+c.getName();
+							// Regarde chaque table au niveau -1
 							for (Table lsTable : lsLvl.get(i-1)) {
+								// Chaque colonne
 								for (Column col : lsTable.getLstColumn()) {
+									//Si elle est primaire
 									if(col.getIsPrimary()) {
+										//Création de la clé de comparaison "tableName.ColumnName"
 										String checkedCol = lsTable.getTableName()+"."+col.getName();
-										for (Constraint cons : c.getLstCons()) {
-											if(cons.getPrimary().equals(checkedCol)) {
-												lsLvl.get(i).add(t);
-												t.setLeveled(true);
+										
+										//Pour chaque enregistrement de contrainte 
+										for(String str : t.getLinkedTable()) {
+											//Si c'est elle Alors on l'ajouter au niveau en cours
+											if( !c.isLeveled() &&  str.equals(checkedCol)) {
+												
+												
+												c.setLeveled(true);
+												
+												if(c.isLeveled())
+													lsLvl.get(i).add(t);
+
+												
+												if (t.isAllLeveled()) {
+													t.setLeveled(true);
+												}
 											}
 										}
+										
+//										for (Constraint cons : c.getLstCons()) {
+//											if(cons.getPrimary().equals(checkedCol)) {
+//												lsLvl.get(i).add(t);
+//												t.setLeveled(true);
+//											}
+//										}
 									}
 								}
 							}
 						}  
 					}
+					//Si il n'y a pas de contraintes -> Ajout au niveau 0
 				}else if( !t.isConstrained() && i==0 ){
 					lsLvl.get(0).add( t );
 					t.setLeveled(true);
 				}
 			}
+			
+			//Si toute les table sont gérées on quite
 			if (db.checkLvlAll() ) {
 				flag = false;
 				break;
-			}
-			if(flag) {
+			}else {
+				//Sinon on ajoute un niveau suplémentaire
 				lsLvl.add(new ArrayList<Table>());
 			}
 			i++;
 		}
 		int j=0;
+		
+		
+		//Pur Affichage
 		for (ArrayList<Table> al : lsLvl) {
 
 			System.out.println("\nNiveau " + j);
@@ -80,174 +110,30 @@ public class utils {
 			j++;
 		}
 		
+		
+		//Création de la vue suivante
 		controler.Control.LaunchViewIteration(lsLvl);
-//		startGeneration();
+
 	}
 
-	
+	//TODO A déplacer...
 	public static void startGeneration() throws SQLException {
-		System.out.println();
 		for(int i = lsLvl.size()-1 ; i >= 0 ; i--) {	
 			for ( Table t : lsLvl.get(i)) {
 				if(!t.isDone())
-					recurTable( t, i );
+					ResearchSql.recurTable( t, i, lsLvl );
 			}
 		}	
 	}
 	
 	
-	public static void recurTable(Table t, int i) throws SQLException {
-		
-		if(i!=0) {
-			
-			for ( Table tableBefore: lsLvl.get( --i ) ) {
-				
-				for (Column  c : t.getLstColumn()) {
-					//check constraints
-					if(c.getIsPrimary()) {
-						
-						for (Constraint cons : c.getLstCons()) {
-							
-							if(cons.getPrimary().contains( tableBefore.getTableName() ) ) {
-								
-								insertSql(t, tableBefore);
-								
-								t.setDone(true);
-								System.out.println(t.getTableName());
-								
-								
-								
-								
-							}
-						}
-					}
-				}
-			}
-		} else {
-			insertSql(t, null);
-			System.out.println("else --- " + t.getTableName());
-			t.setDone(true);
-		}
-		
-		
-		
-	}
 	
-	public static void insertSql(Table t, Table before) throws SQLException {
-		
-		/**
-		 * Creation du début du sql selon le nombre de colonnes !(FK||Primary)
-		 */
-		String sql = "INSERT INTO `"+App.getDBName()+"`.`"+t.getTableName()+"`(";
-		
-		boolean first = true;
-		for (Column c : t.getLstColumn()) {
-			if(!c.getIsPrimary() ) {
-				//sql += ( first ? "" : "," ) + "?";
-				sql += ( first ? "" : "," ) + "`"+c.getName()+"`";
-				first = false;
-			}
-			
-		}
-		
-		sql+= ") VALUES (";
-		first = true;
-		for (Column c : t.getLstColumn()) {
-			
-			if(!c.getIsPrimary()  ) {
-				sql += ( first ? "" : "," ) + " ?";
-				first = false;
-			}
-		}
-		
-		sql += ");";
-		App.dao.setPreparedStatement(sql);
-
-		
-		int nbCol = 0;
-		for (Column v : t.getLstColumn()) {
-			if(  !v.getIsPrimary() ) 
-				 nbCol++;
-		}
-		
-		
-		for(int i=1 ; i <= nbCol ; i++) {
-			final String tmpCol = t.getLstColumn().get(i).getName();
-			
-			//App.dao.getPreparedStatement().setString(  i , t.getLstColumn().get(i).getName() );
-			
-			t.getLstColumn().forEach( (Column v) -> {
-				if (v.getName().equals(tmpCol)) {
-					 ( (FakeModel) ((Faked) v.getFaked()).getFakeOption()).Launch() ;
-				}
-			});
-			
-			if(t.getLstColumn().get(i).getIsConstrained()) {
-				recurTable(before , i);
-				DataStatement( i, t.getLstColumn().get(i)  );
-
-			}else {
-				DataStatement( i, t.getLstColumn().get(i)  );
-				
-			}
-			
-			
-		}
-		
-		System.out.println(App.dao.getPreparedStatement().toString());
-		
-		
-		
-		for (int i = 0; i < t.getNb(); i++) {
-			
-			App.dao.getPreparedStatement().executeUpdate();
-			
-		}
-		
-		
-	}
+	
+	
 
 
 
-	private static void DataStatement(int i, Column column) throws NumberFormatException, SQLException {
-		Date d = Date.valueOf(LocalDate.now());
-		
-		if( column.getType().matches("(?i)TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT") ) {
-			App.dao.getPreparedStatement().setInt(  i , Integer.parseInt(column.getData()) );
-		}else if(column.getType().matches("(?i)DOUBLE|DECIMAL|REAL") ){
-			App.dao.getPreparedStatement().setDouble(  i , Double.parseDouble(column.getData()) );
-		}else if(column.getType().matches("(?i)FLOAT") ){
-			App.dao.getPreparedStatement().setFloat(  i , Float.parseFloat(column.getData()) );
-		}else if(column.getType().matches("(?i)TINYBLOB|MEDIUMBLOB|LONGBLOB|BLOB") ){
-			System.out.println("Blob error!");
-		}else if(column.getType().matches("(?i)TINYTEXT|MEDIUMTEXT|TEXT|LONGTEXT|VARCHAR") ){
-			App.dao.getPreparedStatement().setString(  i , column.getData() );
-		}else if(column.getType().matches("(?i)YEAR") ){
-			d = Date.valueOf( column.getData());
-			SimpleDateFormat sdf = new SimpleDateFormat("Y");
-			sdf.format(d);
-			App.dao.getPreparedStatement().setDate(  i , d );
-		}else if(column.getType().matches("(?i)DATE") ){
-			d = Date.valueOf( column.getData());
-			App.dao.getPreparedStatement().setDate(  i , d );
-		}else if(column.getType().matches("(?i)DATETIME") ){
-			SimpleDateFormat sdf = new SimpleDateFormat("Y-M-d hh:mm:ss");
-			sdf.format(d);
-			d = Date.valueOf( column.getData());
-			App.dao.getPreparedStatement().setDate(  i , d );
-		}else if(column.getType().matches("(?i)TIME") ){
-			Time time = Time.valueOf( column.getData());
-			App.dao.getPreparedStatement().setTime(  i , time );
-		}else if(column.getType().matches("(?i)TIMESTAMP") ){
-			Timestamp timestamp = new Timestamp(Date.valueOf( column.getData()).getTime());
-			App.dao.getPreparedStatement().setTimestamp(  i , timestamp );
-			
-		}else {
-			System.out.println("Error!");
-		}
-		
-		
-	}
+	
 
 	
 	public static ArrayList<JPanel> showIterations(ArrayList<ArrayList<Table>> lsLvl){
@@ -258,6 +144,18 @@ public class utils {
 		
 		
 		return lsPane;
+		
+	}
+	
+	
+	public static Table returnTable(String str) {
+		
+		for (Table t : App.db.getLstTable()) {
+			if(t.getTableName().equals(str)) {
+				return t;
+			}
+		}
+		return null;
 		
 	}
 	

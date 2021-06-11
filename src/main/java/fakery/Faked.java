@@ -1,4 +1,4 @@
-package component;
+package fakery;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,9 +21,8 @@ import javax.swing.JPanel;
 import com.github.javafaker.Faker;
 
 import model.Column;
-import vue.ComboSelecter;
-import vue.Lab;
-import vue.Pane;
+import vue.components.ComboSelecter;
+import vue.components.Lab;
 
 public class Faked extends JPanel{
 	

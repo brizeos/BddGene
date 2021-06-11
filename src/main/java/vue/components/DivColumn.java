@@ -1,4 +1,4 @@
-package vue;
+package vue.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,6 +9,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import model.Column;
+import vue.Pane;
+import vue.ViewPrincipal;
 
 public class DivColumn extends JPanel {
 

@@ -15,15 +15,16 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import model.Column;
-import model.Constraint;
 import model.DaoAccess;
 import model.Database;
 import model.Table;
-import vue.Btn;
-import vue.ComboSelecter;
-import vue.Lab;
+import sql.ResearchSql;
 import vue.Pane;
 import vue.ViewPrincipal;
+import vue.components.Btn;
+import vue.components.ComboSelecter;
+import vue.components.Lab;
+
 
 /***
  * 
@@ -138,7 +139,7 @@ public class App extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					cs.setModel( loadTables() );
+					cs.setModel( ResearchSql.loadTables(frame) );
 				
 				} catch (SQLException e1) {
 					e1.printStackTrace();
@@ -158,7 +159,7 @@ public class App extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					loadDB();
+					ResearchSql.loadDB();
 				} catch (SQLException | IOException e1) {
 					e1.printStackTrace();
 				}
@@ -172,13 +173,13 @@ public class App extends JFrame
     
     
 
-	public static JTextField getJt1() {
+	public  JTextField getJt1() {
 		return jt1;
 	}
-	public static JTextField getJt2() {
+	public JTextField getJt2() {
 		return jt2;
 	}
-	public static JTextField getJt3() {
+	public  JTextField getJt3() {
 		return jt3;
 	}
 	
@@ -186,111 +187,8 @@ public class App extends JFrame
 		return cs.getModel().getSelectedItem().toString();
 	}
 	
-	public static DefaultComboBoxModel<String> loadTables() throws SQLException {
-		
-		String sql = "SELECT DISTINCT `TABLE_SCHEMA` FROM `TABLES` WHERE `TABLE_TYPE`='BASE TABLE' AND `TABLE_SCHEMA` NOT IN ('mysql', 'performance_schema', 'sys', 'syscom');";
-		ResultSet rs = null;
-		DefaultComboBoxModel<String> str = new DefaultComboBoxModel<String>();
-    	
-    	String login = getJt1().getText();
-    	String mdp = getJt2().getText();
-    	String url = "localhost:"+ getJt3().getText();
-    	
-    	dao = new DaoAccess(url, "information_schema", login, mdp, null);
-    	
-    	dao.connect();
-    	
-    	dao.setPreparedStatement(sql);
-    	rs = dao.getPreparedStatement().executeQuery();
-    	while(rs.next()) {
-    		str.addElement(rs.getString(1));
-    
-    	}
-    	dao.disconnect();
- 
-    	return str;
-    	
-    }
 	
-	protected static void loadDB() throws SQLException, IOException {
-		
-			int i = 0, j = 0;
-//			ArrayList<String> lsTables = new ArrayList<>();
-			String sql = "SELECT DISTINCT `TABLE_NAME` FROM `TABLES` WHERE `TABLE_SCHEMA` = ?";
-			
-			ResultSet rs = null;
-			db.setName(cs.getModel().getSelectedItem().toString());
-			
-			dao.connect();
-	    	
-	    	dao.setPreparedStatement(sql);
-	    	dao.getPreparedStatement().setString(1, cs.getModel().getSelectedItem().toString());
-	    	
-	    	rs = dao.getPreparedStatement().executeQuery();
-	    	db.setLstTable(new ArrayList<Table>());
-	    	
-	    	//Récupere les tables
-	    	while(rs.next()) {
-	    		
-	    		ResultSet rsBis = null;
-	    		
-	    		db.getLstTable().add(new Table());	   
-	    		db.getLstTable().get(i).setTableName(rs.getString("TABLE_NAME"));
-	    		db.getLstTable().get(i).setLstColumn(new ArrayList<Column>());
-	    		
-
-	    		
-	    		String sql2 = "SELECT * FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?;";
-	    		dao.setPreparedStatement(sql2);
-	    		dao.getPreparedStatement().setString(1, cs.getModel().getSelectedItem().toString());
-	    		dao.getPreparedStatement().setString(2, rs.getString("TABLE_NAME"));
-	    		
-	    		rsBis = dao.getPreparedStatement().executeQuery();
-	    		while(rsBis.next()) {
-	    			//Récupere les colonnes
-	    			j = 0;
-	    			db.getLstTable().get(i).getLstColumn().add( new Column(	rsBis.getString("COLUMN_NAME"),
-													    					rsBis.getString("DATA_TYPE"),
-													    					rsBis.getInt("CHARACTER_MAXIMUM_LENGTH"),
-													    					(rsBis.getString("COLUMN_KEY").equals("PRI") && rsBis.getString("COLUMN_KEY") != null? true : false),
-													    					((rsBis.getString("IS_NULLABLE").equals("YES") ? true : false)),
-													    					db.getLstTable().get(i) ) );
-
-
-		    		
-	    			db.getLstTable().get(i).getLstColumn().get(j).setLstCons(new ArrayList<Constraint>());
-	    			ResultSet rsCons = null;
-	    			
-	    			String sql3 = "SELECT * FROM `KEY_COLUMN_USAGE` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME`= ? AND `COLUMN_NAME`= ? AND `REFERENCED_COLUMN_NAME` IS NOT null;";
-	    			dao.setPreparedStatement(sql3);
-	    			dao.getPreparedStatement().setString(1, cs.getModel().getSelectedItem().toString());
-	    			dao.getPreparedStatement().setString(2, rs.getString("TABLE_NAME"));
-	    			dao.getPreparedStatement().setString(3, rsBis.getString("COLUMN_NAME"));
-		    		
-		    		rsCons = dao.getPreparedStatement().executeQuery();
-		    		
-		    		while(rsCons.next()) {
-		    			
-		    			db.getLstTable().get(i).getLstColumn().get(j).getLstCons().add(  new Constraint( 
-		    					rsCons.getString("TABLE_NAME")+"."+rsCons.getString("COLUMN_NAME") , 
-		    					rsCons.getString("REFERENCED_TABLE_NAME")+"."+rsCons.getString("REFERENCED_COLUMN_NAME"),
-		    					db.getLstTable().get(i).getLstColumn().get(j))  );
-		    			db.getLstTable().get(i).getLstColumn().get(j).setIsConstrained(true);
-		    			db.getLstTable().get(i).setConstrained(true);
-		    		}
-		    		
-	    			j++;
-	    		}
-	    		
-	    		i++;
-	    	}
-	    	dao.disconnect();
-	    	
-	    	frame.getContentPane().removeAll();
-	    	frame.getContentPane().add(new ViewPrincipal());
-	    	
-	    	frame.repaint();
-	    	frame.revalidate();
-	}
+	
+	
     
 }

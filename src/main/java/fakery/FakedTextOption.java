@@ -1,10 +1,9 @@
-package component;
+package fakery;
 
-import java.awt.Component;
 import java.awt.Label;
 import java.util.ArrayList;
 
-import vue.TCustom;
+import vue.components.TCustom;
 
 public class FakedTextOption extends FakeModel{
 	
