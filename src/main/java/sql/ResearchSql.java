@@ -18,12 +18,17 @@ import fakery.FakeModel;
 import fakery.Faked;
 import model.Column;
 import model.DaoAccess;
+import model.Database;
 import model.Table;
+import relation.RelationModel;
 import vue.ViewPrincipal;
+
+
 
 public class ResearchSql {
 
 	
+	private static String sql4;
 	public static DefaultComboBoxModel<String> loadTables(App app) throws SQLException {
 		
 		String sql = "SELECT DISTINCT `TABLE_SCHEMA` FROM `TABLES` WHERE `TABLE_TYPE`='BASE TABLE' AND `TABLE_SCHEMA` NOT IN ('mysql', 'performance_schema', 'sys', 'syscom');";
@@ -94,37 +99,21 @@ public class ResearchSql {
 												    					((rsBis.getString("IS_NULLABLE").equals("YES") ? true : false)),
 												    					App.db.getLstTable().get(i) ) );
 
-
-	    		
-//    			App.db.getLstTable().get(i).getLstColumn().get(j).setLstCons(new ArrayList<Constraint>());
-    			ResultSet rsCons = null;
+	    	
     			
-    			String sql3 = "SELECT * FROM `KEY_COLUMN_USAGE` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME`= ? AND `COLUMN_NAME`= ? AND `REFERENCED_COLUMN_NAME` IS NOT null;";
-    			App.dao.setPreparedStatement(sql3);
-    			App.dao.getPreparedStatement().setString(1, App.cs.getModel().getSelectedItem().toString());
-    			App.dao.getPreparedStatement().setString(2, rs.getString("TABLE_NAME"));
-    			App.dao.getPreparedStatement().setString(3, rsBis.getString("COLUMN_NAME"));
-	    		
-	    		rsCons = App.dao.getPreparedStatement().executeQuery();
-	    		
-	    		while(rsCons.next()) {
-	    			
-//	    			App.db.getLstTable().get(i).getLstColumn().get(j).getLstCons().add(  new Constraint( 
-//	    					rsCons.getString("TABLE_NAME")+"."+rsCons.getString("COLUMN_NAME") , 
-//	    					rsCons.getString("REFERENCED_TABLE_NAME")+"."+rsCons.getString("REFERENCED_COLUMN_NAME"),
-//	    					App.db.getLstTable().get(i).getLstColumn().get(j))  );
-	    			App.db.getLstTable().get(i).getLinkedTable().add(rsCons.getString("REFERENCED_TABLE_NAME")+"."+rsCons.getString("REFERENCED_COLUMN_NAME"));
-	    			App.db.getLstTable().get(i).getLstColumn().get(j).setIsConstrained(true);
-	    			App.db.getLstTable().get(i).setConstrained(true);
-	    		}
 	    		
     			j++;
     		}
     		
+    		//System.out.println(App.db.getLstTable().get(i).getTableName() + "   " + App.db.getLstTable().get(i).getRelationModel().getRelationMap().size());
+    		if(App.db.getLstTable().get(i).getRelationModel().getRelationMap().size() == 0) {
+    			Column tmp = null;
+    			App.db.getLstTable().get(i).getRelationModel().getRelationMap().put("root", new RelationModel(tmp));
+    		}
+    		App.db.getLstTable().get(i).getRelationModel().reload();
     		i++;
     	}
     	App.dao.disconnect();
-    	
     	App.frame.getContentPane().removeAll();
     	App.frame.getContentPane().add(new ViewPrincipal());
     	
@@ -133,9 +122,6 @@ public class ResearchSql {
 	}
 
 
-	public static void insertIn() {
-		
-	}
 	
 	
 	public static void DataStatement(int i, Column column) throws NumberFormatException, SQLException {
@@ -179,132 +165,84 @@ public class ResearchSql {
 	}
 
 	
-public static void recurTable(Table t, int i, ArrayList<ArrayList<Table>> lsLvl) throws SQLException {
+	
+	private static Database db = App.db;
+
+	public static void recurTable(Table t) throws SQLException {
 		
-	/**
-	 * Else{} -> Si aucun dépendences
-	 */
-		if(i!=0) {
-			/**
-			 * Pour chaque table niveau -1 -> Potentiellement dépendentes
-			 */
-			for ( Table tableBefore: lsLvl.get( --i ) ) {
-				
-				/**
-				 * Check chaque colonnes
-				 */
-				
-
-				
-				
-				for (Column  c : t.getLstColumn()) {
-					
-					
-					if(c.getIsPrimary()) {
-						for (String str : tableBefore.getLinkedTable()) {
-							if ( (t.getTableName()+"."+c.getName()).equals(str)   ) {
-								
-								recurTable(tableBefore, i, lsLvl);
-								System.out.println(t.getTableName());
-								
-							}
-						}
-						
-//						for (Constraint cons : c.getLstCons()) {
-//							
-//							if(cons.getPrimary().contains( tableBefore.getTableName() ) ) {
-//								
-//								insertSql(t, tableBefore, lsLvl);
-//								
-//								t.setDone(true);
-//								System.out.println(t.getTableName());
-//								
-//							}
-//						}
-					}
-				}
+		for(int i= db.getLstTable().indexOf(t) ; i<db.getLstTable().size()-1 ; i++) {
+			if( db.getLstTable().indexOf(t) < db.getLstTable().size() ) {
+				insertSql(t);
+				t.setDone(true);
 			}
-		} else {
-			insertSql(t, null, lsLvl);
-			System.out.println("else --- " + t.getTableName());
-			t.setDone(true);
 		}
-}	
+	}
+	
+				
+					
 
 
-	public static void insertSql(Table t, Table before, ArrayList<ArrayList<Table>> lsLvl) throws SQLException {
+		
+	public static void insertSql(Table t) throws SQLException {
+		
+		ArrayList<String> lsStrColNameToInsert = new ArrayList<String>(); 
 		
 		/**
 		 * Creation du début du sql selon le nombre de colonnes !(FK||Primary)
 		 */
 		String sql = "INSERT INTO `"+App.getDBName()+"`.`"+t.getTableName()+"`(";
-		
+		int nbCol = 0;
 		boolean first = true;
 		for (Column c : t.getLstColumn()) {
-			if(!c.getIsPrimary() ) {
-				//sql += ( first ? "" : "," ) + "?";
+//			c.carte();
+			if(!c.getIsPrimary() || c.isMultiPass() ) {
 				sql += ( first ? "" : "," ) + "`"+c.getName()+"`";
 				first = false;
+				nbCol++;
+				lsStrColNameToInsert.add(c.getName());
 			}
-			
 		}
 		
 		sql+= ") VALUES (";
 		first = true;
-		for (Column c : t.getLstColumn()) {
-			
-			if(!c.getIsPrimary()  ) {
-				sql += ( first ? "" : "," ) + " ?";
-				first = false;
-			}
+		
+		for (String str : lsStrColNameToInsert ) {
+			sql += ( first ? "" : "," ) + " ?";
+			first = false;
 		}
 		
 		sql += ");";
 		App.dao.setPreparedStatement(sql);
-
-		
-		int nbCol = 0;
-		for (Column v : t.getLstColumn()) {
-			if(  !v.getIsPrimary() ) 
-				 nbCol++;
-		}
-		
-		
-		for(int i=1 ; i <= nbCol ; i++) {
-			final String tmpCol = t.getLstColumn().get(i).getName();
-			
-			//App.dao.getPreparedStatement().setString(  i , t.getLstColumn().get(i).getName() );
-			
-			t.getLstColumn().forEach( (Column v) -> {
-				if (v.getName().equals(tmpCol)) {
-					 ( (FakeModel) ((Faked) v.getFaked()).getFakeOption()).Launch() ;
+		/**
+		 * Execution nombre de fois précisé par les options/demande utilisateur
+		 */
+		for (int j = 0; j < t.getNb() ; j++) {
+			/**
+			 * Ecriture de la data Faker || id de clé étrangère
+			 */
+			int i = 1;
+			for (String str : lsStrColNameToInsert) {
+				for (Column v : t.getLstColumn()) {
+					if (v.getName().equals(str)) {
+						( (FakeModel) ((Faked) v.getFaked()).getFakeOption()).Launch() ;
+						ResearchSql.DataStatement( i, v );
+						i++;
+					}
 				}
-			});
-			
-			if(t.getLstColumn().get(i).getIsConstrained()) {
-				recurTable(before , i, lsLvl);
-				ResearchSql.DataStatement( i, t.getLstColumn().get(i)  );
-
-			}else {
-				ResearchSql.DataStatement( i, t.getLstColumn().get(i)  );
-				
 			}
 			
+//			System.out.println(App.dao.getPreparedStatement().toString());
 			
+			try {
+				App.dao.getPreparedStatement().executeUpdate();
+				t.increment();
+			}catch(Exception e) {
+				System.out.println("Error Catched!");
+			}
+	
 		}
-		
-		System.out.println(App.dao.getPreparedStatement().toString());
-		
-		
-		
-		for (int i = 0; i < t.getNb(); i++) {
-			
-			App.dao.getPreparedStatement().executeUpdate();
-			
-		}
-			
-			
-	}
-		
+	}	
 }
+		
+
 

@@ -1,11 +1,13 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Database {
 
 	private String name;
 	private ArrayList<Table> lstTable;
+	private static int nbFk, indexLST;
 
 	
 	
@@ -72,17 +74,16 @@ public class Database {
 		}
 		return true;
 	}
-
+	
 
 
 	public Database sortByLevel() {
-		System.out.println(lstTable);
 
 		boolean flag = true;
 		Table tmp = null;
 		while(flag) {
 			
-			for (int indexLST=0 ; indexLST<this.lstTable.size() ; indexLST++) {
+			for (indexLST=0 ; indexLST<this.lstTable.size() ; indexLST++) {
 				if ( indexLST==0 && !this.lstTable.get(indexLST).getLinkedTable().isEmpty() ) {
 					tmp = this.lstTable.get(indexLST);
 					this.lstTable.remove(indexLST);
@@ -90,25 +91,16 @@ public class Database {
 					
 				}else if(!this.lstTable.get(indexLST).getLinkedTable().isEmpty()) {
 					
-					int nbFk = this.lstTable.get(indexLST).getLinkedTable().size();
-					for(int indexPri=0 ; indexPri<this.lstTable.get(indexLST).getLinkedTable().size() ; indexPri++) {
-						
-						
+					nbFk = this.lstTable.get(indexLST).getLinkedTable().size();
+					
+					this.lstTable.get(indexLST).getLinkedTable().forEach( (k, v) -> {
 						for(int indexBack=0 ; indexBack<indexLST ; indexBack++) {
-							
-							if(this.lstTable.get(indexLST).getLinkedTable().get(indexPri).contains(this.lstTable.get(indexBack).getTableName())){
+							if(v.contains(this.lstTable.get(indexBack).getTableName())){
 								nbFk--;
 							}
-//							
-//							if(this.lstTable.get(indexBack).getTableName().equals(this.lstTable.get(indexLST).getLinkedTable().get(indexPri))){
-//								nbFk--;
-//							}
-							
-							
 						}
-						
-						
-					}
+					});
+					
 					if(nbFk!=0) {
 						tmp = this.lstTable.get(indexLST);
 						this.lstTable.remove(indexLST);
@@ -131,34 +123,33 @@ public class Database {
 			
 			flag = false;
 			
-			for (int indexLST=0 ; indexLST<this.lstTable.size() ; indexLST++) {
+			for (indexLST=0 ; indexLST<this.lstTable.size() ; indexLST++) {
 				if ( indexLST==0 && !this.lstTable.get(indexLST).getLinkedTable().isEmpty() ) {
 					flag = true;
 				}else if(!this.lstTable.get(indexLST).getLinkedTable().isEmpty()) {
-					int nbFk = this.lstTable.get(indexLST).getLinkedTable().size();
-//					System.out.println(this.lstTable.get(indexLST));
-//					System.out.println(this.lstTable.get(indexLST).getLinkedTable());
-					for(int indexPri=0 ; indexPri<this.lstTable.get(indexLST).getLinkedTable().size() ; indexPri++) {
+					nbFk = this.lstTable.get(indexLST).getLinkedTable().size();
+					
+					this.lstTable.get(indexLST).getLinkedTable().forEach( (k, v) -> {
 						for(int indexBack=0 ; indexBack<indexLST ; indexBack++) {
-							
-							if(this.lstTable.get(indexLST).getLinkedTable().get(indexPri).contains(this.lstTable.get(indexBack).getTableName())){
+							if(v.contains(this.lstTable.get(indexBack).getTableName())){
 								nbFk--;
 							}
-							
-//							if(this.lstTable.get(indexBack).getTableName().contains(this.lstTable.get(indexLST).getLinkedTable().get(indexPri)))
 						}
-					}
+					});
+					
 					if(nbFk!=0) {
 						flag =true;
 					}
+					
 				}
 			}
 			
 			
 			
 		}
-		System.out.println(lstTable);
-		
+
+		//Collections.reverse(lstTable);
+//		System.out.println(lstTable);
 		return this;
 	}
 	

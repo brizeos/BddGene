@@ -2,6 +2,7 @@ package fakery;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -19,6 +20,7 @@ public abstract class FakeModel extends JPanel {
 	public Faked faked = null;
 	public ArrayList<Component> ls;
 	public Lab noOpt = null;
+	private TCustom optOne = null, optTwo = null, optThree = null;
 	
 
 	public FakeModel(Faked fake) {
@@ -39,8 +41,9 @@ public abstract class FakeModel extends JPanel {
 	 * 
 	 * @param lsStr List of parameters to use in Faker command line
 	 * @return String :  Generated data
+	 * @throws SQLException 
 	 */
-	public abstract void Launch();
+	public abstract void Launch() throws SQLException;
 	
 	/**
 	 * Reload content
@@ -82,6 +85,30 @@ public abstract class FakeModel extends JPanel {
 		return ls;
 	}
 	
+	public TCustom getOpt1() {
+		return optOne;
+	}
+
+	public void setOpt1(TCustom opt1) {
+		this.optOne = opt1;
+	}
+
+	public TCustom getOpt2() {
+		return optTwo;
+	}
+
+	public void setOpt2(TCustom opt2) {
+		this.optTwo = opt2;
+	}
+
+	public TCustom getOpt3() {
+		return optThree;
+	}
+
+	public void setOpt3(TCustom opt3) {
+		this.optThree = opt3;
+	}
+
 	public Faked getFaked() {
 		return faked;
 	}
@@ -101,14 +128,30 @@ public abstract class FakeModel extends JPanel {
 	public ArrayList<Object> checkParameters(){
 		ArrayList<Object> ls = new ArrayList<Object>();
 		
-		for (Component ob : ((JPanel)this.getComponent(0)).getComponents() ) {
-			if (ob instanceof TCustom) {
+		for (Component ob : this.getLs() ) {
+			if ( ob instanceof TCustom)
 				ls.add(((TCustom) ob).getText());
-			}
 		}
 		return ls;
 		
 	}
+	
+//	private ArrayList<TCustom> returnAllParams(){
+//		ArrayList<TCustom> ls = new ArrayList<TCustom>();
+//		
+//		if (this.getOpt1() != null) {
+//			ls.add(this.optOne);
+//		}
+//		if (this.getOpt2() != null) {
+//			ls.add(this.optTwo);
+//		}
+//		if (this.getOpt3() != null) {
+//			ls.add(this.optThree);
+//		}
+//		return ls;
+//		
+//		
+//	}
 	
 
 }

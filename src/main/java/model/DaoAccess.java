@@ -8,7 +8,8 @@ import java.sql.SQLException;
 public class DaoAccess{
 
 	private String				strClassName = "com.mysql.cj.jdbc.Driver";
-	private String				url;
+	private String				ur;
+	private String				local;
 	private String				login;
 	private String				mdp;
 	
@@ -22,14 +23,15 @@ public class DaoAccess{
 		this.login=login;
 		this.mdp=mdp;
 		this.driver=driver;
-		this.url = "jdbc:mysql://" + url + "/" + nomBDD + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+		this.local = url;
+		this.ur = "jdbc:mysql://" + url + "/" + nomBDD + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
 	}
 	
 	public void connect()
 	{
 		try { // try for connexion to database
 			Class.forName(strClassName);	
-			this.conn = DriverManager.getConnection(this.url,this.login,this.mdp);
+			this.conn = DriverManager.getConnection(this.ur,this.login,this.mdp);
 		} 
 		catch(ClassNotFoundException e)
 		{  
@@ -80,6 +82,16 @@ public class DaoAccess{
 	public PreparedStatement getSecond()
 	{
 		return prs2;
+	}
+	
+	public void changeBdd(String str) {
+		try {
+			this.ur = "jdbc:mysql://" + this.local + "/" + str + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+			this.conn = this.conn = DriverManager.getConnection(this.ur,this.login,this.mdp);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

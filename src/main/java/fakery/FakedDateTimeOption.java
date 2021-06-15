@@ -2,6 +2,7 @@ package fakery;
 
 import java.awt.Label;
 import java.sql.Date;
+import java.time.*;
 import java.util.ArrayList;
 
 import vue.components.TCustom;
@@ -21,14 +22,13 @@ public class FakedDateTimeOption extends FakeModel {
 	
 	@Override
 	public void Launch() {
-		Date str = null;
+		LocalDate str = null;
 		ArrayList<Object> lsStr = this.checkParameters();
-		String dateFrom = "01-01-" + lsStr.get(0);
-		String dateTo = "31-12-" + lsStr.get(1);
-		
+		String dateFrom = "2001-01-01";   	//lsStr.get(0);
+		String dateTo = "2010-12-30";    	//lsStr.get(1);
 		switch (this.faked.getFtSec().getSelectedItem().toString().replaceAll("\"", "")) {
 			
-			case "Random Between" : str = (Date) f.date().between( Date.valueOf(dateFrom), Date.valueOf(dateTo));
+			case "Random Between" : str =  f.date().between( Date.valueOf(dateFrom), Date.valueOf(dateTo)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate() ;
 				break;
 			
 		}

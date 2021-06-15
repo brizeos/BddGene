@@ -1,9 +1,12 @@
 package fakery;
 
 import java.awt.Label;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import MavenBdd.Generator.App;
+import model.Column;
 import vue.components.TCustom;
 
 public class FakedNumberOption extends FakeModel {
@@ -26,12 +29,12 @@ public class FakedNumberOption extends FakeModel {
 	
 
 	@Override
-	public void Launch() {
+	public void Launch() throws SQLException {
 		int str = 0;		
 		ArrayList<Object> lsStr = this.checkParameters();
 		
 		if(this.getFaked().getParentCol().getIsConstrained()) {
-			this.getFaked().setData( String.valueOf( searchForConstraint()) );
+			this.getFaked().setData( String.valueOf( searchForConstraint(this.faked.getParentCol())) );
 		}else {
 			
 			switch (this.faked.getFtSec().getSelectedItem().toString().replaceAll("\"", "")) {
@@ -44,21 +47,27 @@ public class FakedNumberOption extends FakeModel {
 					break;
 				
 			}
+			this.getFaked().setData( String.valueOf(str));
+			
 		}
-		getFaked().setData( String.valueOf(str));
 
 	}
 
+
 	
-
-	private int searchForConstraint() {
+	private int searchForConstraint(Column c) throws SQLException {
 		int i = 0;
-
-		String sql ="";
+	//TODO GERER LA RECUPERATION DE CLé
+		
+		String sql ="Select COUNT(`"+ c.getTable().getLinkedTable().get(c.getName()).substring( c.getTable().getLinkedTable().get( c.getName()).indexOf(".")+1 ) +"`)"
+				+" from `" +c.getTable().getLinkedTable().get(c.getName()).substring(0, c.getTable().getLinkedTable().get(c.getName()).indexOf("."))+ "`;";
 		
 		App.dao.setSecond(sql);
 		
+		ResultSet rs = App.dao.getSecond().executeQuery();
 		
+		while (rs.next())
+			i = f.number().numberBetween(1, rs.getInt(1));
 		
 		
 		return i;

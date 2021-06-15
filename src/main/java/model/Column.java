@@ -7,18 +7,19 @@ import java.sql.SQLException;
 
 import MavenBdd.Generator.App;
 import fakery.Faked;
+import relation.RelationModel;
 
 public class Column {
 
 	private String name, type;
 	private int val;
 	private Boolean isConstrained, isPrimary;
-//	private ArrayList<Constraint> lstCons = new ArrayList<Constraint>();
 	private Faked f;
 	private String data;
 	private boolean validated, nullAccepted;
 	private Table table;
 	private Boolean leveled;
+	private boolean multiPass;
 	
 	
 	public Column(String name, String type, int val, boolean isPrimary,boolean nullAccepted, Table table) throws SQLException, IOException {
@@ -31,13 +32,13 @@ public class Column {
 		this.isConstrained = false;
 		this.isPrimary = isPrimary;
 		this.leveled = true;
-//		this.lstCons = new ArrayList<Constraint>();
+		this.setMultiPass(false);
 		this.setValidated(false);
 		this.setTable(table);
 		
 		
 		
-		String str = "SELECT * FROM `KEY_COLUMN_USAGE` WHERE `TABLE_NAME`= ? AND `TABLE_SCHEMA`= ? AND `COLUMN_NAME` = ? ;";
+		String str = "SELECT * FROM `KEY_COLUMN_USAGE` WHERE `TABLE_NAME`= ? AND `TABLE_SCHEMA`= ? AND `COLUMN_NAME` = ? AND `CONSTRAINT_NAME` != 'PRIMARY';";
 		App.dao.setPreparedStatement(str);
 		App.dao.getPreparedStatement().setString(1, table.getTableName());
 		App.dao.getPreparedStatement().setString(2, App.getDBName());
@@ -48,15 +49,27 @@ public class Column {
 		rs = App.dao.getPreparedStatement().executeQuery();
 		
 		while(rs.next()) {
+			this.table.getLinkedTable().put(rs.getString("COLUMN_NAME"),  rs.getString("REFERENCED_TABLE_NAME")+"."+rs.getString("REFERENCED_COLUMN_NAME"));
+			
+			this.getTable().getRelationModel().getRelationMap().put(this.name, new RelationModel( this ));
+			
+			//.add(new RelationModel( RelationModel.checkRelation( this) ));
+			
 			this.isConstrained = true;
+			
 		}
 		
 		
+		
+		
+		
+		if(this.isConstrained && this.isPrimary) {
+			this.multiPass = true;
+		}
+		
+		
+		
 		this.f = new Faked(this);
-		
-		
-		
-		
 		
 	}
 
@@ -66,7 +79,7 @@ public class Column {
 	
 	}
 	
-
+	
 
 	public String toString() {
 		return this.getName();
@@ -111,17 +124,6 @@ public class Column {
 		this.isConstrained = isConstrained;
 		this.leveled = false;
 	}
-
-
-//	public ArrayList<Constraint> getLstCons() {
-//		return lstCons;
-//	}
-//
-//
-//	public void setLstCons(ArrayList<Constraint> lstCons) {
-//		this.lstCons = lstCons;
-//	}
-
 
 	public Boolean getIsPrimary() {
 		return isPrimary;
@@ -184,6 +186,29 @@ public class Column {
 	public void setLeveled(boolean bool) {
 		this.leveled = bool;
 	}
+
+
+	public boolean isMultiPass() {
+		return multiPass;
+	}
+
+
+	public void setMultiPass(boolean multiPass) {
+		this.multiPass = multiPass;
+	}
+
+
+	public void carte() {
+		
+		System.out.println(this.name +", "+ this.table.getTableName());
+		System.out.println("Constained?"+this.isConstrained);
+		System.out.println("Primary?"+this.isPrimary);
+		System.out.println("MultiPass?"+ this.multiPass);
+		System.out.println();
+		
+		
+	}
+
 	
 	
 	

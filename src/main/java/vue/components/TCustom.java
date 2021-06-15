@@ -14,6 +14,7 @@ public class TCustom extends JTextField {
 		setMaximumSize(dim);
 		setMinimumSize(dim);
 		setPreferredSize(dim);
+		setText("0");
 		
 	}
 

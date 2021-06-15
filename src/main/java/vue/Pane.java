@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -18,6 +19,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+
+import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 
 import MavenBdd.Generator.App;
 import MavenBdd.Generator.utils;
@@ -30,7 +33,7 @@ import vue.components.Lab;
 
 public class Pane extends JPanel {
 
-	public static Table tableSelected = new Table();
+	public static Table tableSelected = null;
 	private static Column column;
 	private JButton  btn;
 	private Lab nbRestant;
@@ -38,9 +41,12 @@ public class Pane extends JPanel {
 	private JButton okay;
 	private Pane paneNav;
 	private Btn btnDeco;
-	private Btn btnNext;
+	private Btn btnNext, truncate;
+	private Pane paneRelation;
 	
-	
+	/**
+	 * ******************************************
+	 */
 	
 	public Pane() {
 		super();
@@ -50,6 +56,9 @@ public class Pane extends JPanel {
 		
 	}
 
+	/**
+	 * ******************************************
+	 */
 
 	public Pane(int x, int y, int wx, int wy) {
 		
@@ -59,14 +68,20 @@ public class Pane extends JPanel {
 		
 	}
 
+	/**
+	 * ******************************************LATERAL
+	 */
 
 	public Pane(int x, int y, int wx, int wy, Database db) {
+		
+		
 		
 		super();
 		setBounds(x, y , wx, wy);
 		setLayout(null);
 		
 		this.db = db.sortByLevel();
+		
 		
 		
 		
@@ -87,8 +102,8 @@ public class Pane extends JPanel {
 			
 			
 			
-			if(tmpTable.getChildCount() == 0) 
-				root.remove(tmpTable);
+//			if(tmpTable.getChildCount() == 0) 
+//				root.remove(tmpTable);
 			
 			
 
@@ -100,12 +115,14 @@ public class Pane extends JPanel {
 		orga.setBounds(10, 10, wx-20, wy-200);
 		orga.setFont(new Font(orga.getFont().getFamily(), Font.BOLD, 15));
 		add(orga);
-
+		
+	
 
 		this.nbRestant = new Lab("Il reste " + this.db.checkNb() + " colonnes à configurer.");
 		this.nbRestant.setBounds(30, wy-180, wx-50, 50);
 		this.nbRestant.setFont(new Font("Arial", getFont().getStyle(), 25));
 		add(this.nbRestant);
+		
 
 		this.btnDeco = new Btn("Déconnexion", 0, 0, (wx-80)/2, 80);
 		this.btnNext = new Btn("Suivant", (wx-80)/2, 0, (wx-80)/2, 80);
@@ -115,8 +132,9 @@ public class Pane extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				try {
+					App.dao.changeBdd(App.getDBName());
 					App.dao.connect();
-					utils.LaunchDiff();
+					utils.startGeneration();
 					App.dao.disconnect();
 				} catch (SQLException e1) {
 					e1.printStackTrace();
@@ -125,7 +143,7 @@ public class Pane extends JPanel {
 			
 		});	
 
-
+	
 
 
 
@@ -134,16 +152,23 @@ public class Pane extends JPanel {
 		this.paneNav.add(this.btnDeco);
 		this.paneNav.add(this.btnNext);
 		add(this.paneNav);
+		
+		
 	}
 
-
+	/**
+	 * ******************************************
+	 */
+	
 	public Pane(int x, int y, int wx, int wy, ArrayList<Column> lstColumn) {
 		
 		super();
 		
+		
 		setBounds(x, y , wx, wy);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		
+//		App.db.launchAllRelationModel();
 		
 		LoadDiv(); 
 		
@@ -152,6 +177,9 @@ public class Pane extends JPanel {
 		
 	}
 
+	/**
+	 * ******************************************
+	 */
 	
 	public Pane(int i, int j, int k, int l, Column c) {
 		this.okay = new JButton("Valider");
@@ -220,121 +248,11 @@ public class Pane extends JPanel {
 		
 		
 	}
-
-
-	public Pane(ArrayList<ArrayList<Table>> lsLvl) {
-		this.okay = new JButton("Valider");
-		this.btn = new JButton("Annuler");
-		
-		
-		setBounds(0, 0, 450, App.frame.getContentPane().getHeight());
-		setLayout(null);
-		setEnabled(true);
-		setVisible(true);
-		
-		
-		
-		
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(lsLvl);
-		
-		DefaultTreeModel dft = new DefaultTreeModel(root);
-		
-		JTree orga = new JTree(dft);
-		
-	//	for(Table t : lsLvl.getLstTable()) {
-		for (int i = lsLvl.size()-1 ; i >=0 ; i--) {
-			for (int j = 0; j < lsLvl.get(i).size(); j++) {
-				Table t = lsLvl.get(i).get(j);
-				
-				DefaultMutableTreeNode tmpTable = new DefaultMutableTreeNode( t.getTableName() );
-				root.add( tmpTable );
-				
-				for(String str : t.getLinkedTable()) {
-					DefaultMutableTreeNode tmpCol = new DefaultMutableTreeNode( str );
-					tmpTable.add(tmpCol);				
-					
-				}
-
-			}
 	
-			orga.addTreeSelectionListener(new MyTreeSelectionI());
 	
-			orga.setCellRenderer(new MyCellIterator());
-			orga.setBounds(10, 10, App.frame.getContentPane().getWidth(), App.frame.getContentPane().getHeight());
-			orga.setFont(new Font(orga.getFont().getFamily(), Font.BOLD, 15));
-			add(orga);
-			
-		
-		
-		
-		
-		
-		
-		
-		}
-		
-		
-		
-	
-		
-		
-		this.btn.addMouseListener(new MouseAdapter() {
-			
-			@Override
-			public void mousePressed(MouseEvent e) {
-				super.mousePressed(e);
-				
-				ViewPrincipal.getLateral().updateNbRestant();
-				
-				ViewPrincipal.getLateral().setEnabled(true);
-				ViewPrincipal.getLateral().setVisible(true);
-				
-				ViewPrincipal.getContent().setEnabled(true);
-				ViewPrincipal.getContent().setVisible(true);
-				
-				ViewPrincipal.getModif().setVisible(false);
-				ViewPrincipal.getModif().setEnabled(false);
-							
-				ViewPrincipal.getModif().repaint();
-				ViewPrincipal.getModif().revalidate();
-				
-				
-				
-			}
-		
-		});
-		this.okay.addMouseListener(new MouseAdapter() {
-			
-			@Override
-			public void mousePressed(MouseEvent e) {
-				super.mousePressed(e);
-				getColumn().setValidated(true);
-				
-				ViewPrincipal.getLateral().updateNbRestant();
-				
-				ViewPrincipal.getLateral().setEnabled(true);
-				ViewPrincipal.getLateral().setVisible(true);
-				
-				ViewPrincipal.getContent().setEnabled(true);
-				ViewPrincipal.getContent().setVisible(true);
-				
-				ViewPrincipal.getModif().setVisible(false);
-				ViewPrincipal.getModif().setEnabled(false);
-							
-				ViewPrincipal.getModif().repaint();
-				ViewPrincipal.getModif().revalidate();
-			}
-		
-		});
-		
-		repaint();
-		revalidate();
-		App.frame.repaint();
-		App.frame.revalidate();
-		
-		
-	
-	}
+	/**
+	 * ******************************************
+	 */
 
 
 	public static void LoadCol() {
@@ -350,17 +268,25 @@ public class Pane extends JPanel {
 		
 		
 	}
-
+	
+	
+	/**
+	 * ******************************************
+	 */
+	
 	private void LoadDiv() {
 		removeAll();
-		int i = 0;
 		
-		for(Column c : tableSelected.getLstColumn()) {
-			if( !(c.getIsConstrained()) && !(c.getIsPrimary()) ) {
-				DivColumn j = new DivColumn(c);
-				j.add(new Lab(c.getName()));
-				ViewPrincipal.getContent().add(j);
-				
+		
+		if(tableSelected != null) {
+			add(tableSelected.getRelationModel());
+		
+			for(Column c : tableSelected.getLstColumn()) {
+				if( !(c.getIsConstrained()) && !(c.getIsPrimary()) ) {
+					DivColumn j = new DivColumn(c);
+					j.add(new Lab(c.getName()));
+					ViewPrincipal.getContent().add(j);
+				}
 			}
 		}
 	}
@@ -391,51 +317,11 @@ public class Pane extends JPanel {
 		    return this;
 		}
 	}
-	
-	class MyTreeSelectionI implements TreeSelectionListener{
 
-		@Override
-		public void valueChanged(TreeSelectionEvent e) {
-			DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-			if( tmp.getUserObject() instanceof Table ) {
-				tableSelected = (Table) tmp.getUserObject();
-				ViewPrincipal.getContent().LoadIterator();
-				ViewPrincipal.getContent().repaint();
-				ViewPrincipal.getContent().revalidate();
-			}
-		}
-	}
-	class MyCellIterator extends DefaultTreeCellRenderer
-	{
-		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus){
-		    super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		    DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-		    if(node.getChildCount() == 0) {
-		      this.setDisabledIcon(this.getDefaultLeafIcon());
-		    }
-		    return this;
-		}
-	}
 	
 	public static Table getTableSelected() {
 		return tableSelected;
 	}
-
-	public void LoadIterator() {
-		removeAll();
-		int i = 0;
-		
-		for(String c : tableSelected.getLinkedTable()) {
-			for (Table t : App.db.getLstTable()) {
-				if(t.getTableName().equals(c)) {
-					add( new Pane () );
-				}
-			}
-		}
-
-		
-	}
-
 
 	public static void setTableSelected(Table tableSelected) {
 		Pane.tableSelected = tableSelected;

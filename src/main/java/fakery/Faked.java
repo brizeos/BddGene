@@ -32,6 +32,7 @@ public class Faked extends JPanel{
 	private static Faker f= new Faker();
 	private String data;
 	private JPanel fakeOption;
+	private int nbDone;
 	
 	/**
 	 * 
@@ -41,7 +42,8 @@ public class Faked extends JPanel{
 	public Faked(Column column) throws IOException {
 		this.parentCol = column;
 		this.data = "";
-
+		this.nbDone = 0;
+		
 		if( this.parentCol.getType().matches("(?i)TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT") ) {
 			setContent("lstNumber.json");
 		}else if(this.parentCol.getType().matches("(?i)FLOAT|DOUBLE|DECIMAL|REAL") ){
@@ -109,7 +111,7 @@ public class Faked extends JPanel{
 		 * Options
 		 */
 		this.fakeOption = newOption();    
-		add(this.fakeOption);
+		add(this.fakeOption);	
 		
 		
 		
@@ -234,4 +236,6 @@ public class Faked extends JPanel{
 	public Column getParentCol() {
 		return parentCol;
 	}
+
+	
 }

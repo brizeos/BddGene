@@ -1,6 +1,16 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import relation.RelationModel;
+
+import vue.Pane;
 
 public class Table {
 
@@ -9,7 +19,9 @@ public class Table {
 	private boolean isConstrained, leveled, done;
 	private int nb;
 	
-	ArrayList<String> linkedTable;
+	private HashMap<String, String> linkedTable;
+	private int nbDone;
+	private RelationModel relationPane;
 	
 	public Table() {
 		super();
@@ -17,18 +29,29 @@ public class Table {
 		this.leveled = false;
 		this.isConstrained = false;
 		this.setDone(false);
-		this.linkedTable = new ArrayList<String>();
+		this.linkedTable = new HashMap<String, String>();
 		/**
 		 * Fields about Iterations
 		 */
-		this.nb = 1; //TODO zero
+		this.nbDone = 0;
+		this.nb = 10; //TODO zero
 		
 		
 		
-	
+		this.relationPane = new RelationModel(this);
+		
+		
+		//TODO relationPane : charger les options
 	}
 	
-	
+	public void increment() {
+		this.nbDone ++;
+		if (this.nbDone >= this.nb ) {
+			this.setDone(true);
+			
+		}
+		
+	}
 	
 	
 	public String getTableName() {
@@ -97,7 +120,6 @@ public class Table {
 
 
 	public int getNb() {
-		// TODO Auto-generated method stub
 		return this.nb;
 	}
 	public void setNb(int nb) {
@@ -107,14 +129,14 @@ public class Table {
 
 
 
-	public ArrayList<String> getLinkedTable() {
+	public HashMap<String, String> getLinkedTable() {
 		return linkedTable;
 	}
 
 
 
 
-	public void setLinkedTable(ArrayList<String> linkedTable) {
+	public void setLinkedTable(HashMap<String, String> linkedTable) {
 		this.linkedTable = linkedTable;
 	}
 
@@ -127,6 +149,19 @@ public class Table {
 				return false;
 		}
 		return true;
+	}
+	
+	public boolean thereIsThisConstraint(String str) {
+		
+		if(linkedTable.containsKey(str))
+			return true;
+
+		return false;
+	}
+
+	public RelationModel getRelationModel() {
+		
+		return this.relationPane;
 	}
 
 }

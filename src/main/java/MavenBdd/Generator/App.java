@@ -160,6 +160,7 @@ public class App extends JFrame
 			public void actionPerformed(ActionEvent e) {
 				try {
 					ResearchSql.loadDB();
+					
 				} catch (SQLException | IOException e1) {
 					e1.printStackTrace();
 				}
