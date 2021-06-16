@@ -12,22 +12,27 @@ import model.Column;
 import vue.Pane;
 import vue.ViewPrincipal;
 
+@SuppressWarnings("serial")
 public class DivColumn extends JPanel {
 
 	private Column col;
 
-	public DivColumn(Column c) {
+	/***
+	 * Panel who is loaded in the ViewPrincipal to show columns needed to be parameterized.
+	 * Contains a column and can be clicked to show setting options.
+	 * @param column Colum to load in this panel.
+	 */
+	public DivColumn(Column column) {
 
 		setLayout(new FlowLayout());
 		setPreferredSize(new Dimension(800, 80));
 		setMaximumSize(new Dimension(800, 80));
 		setBackground(Color.green);
 		
-		this.col = c;
+		this.col = column;
 		
-		//Click sur la DIV
+		//OnClick load this column settings.
 		addMouseListener(new MouseAdapter() {
-		
 			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
@@ -46,13 +51,14 @@ public class DivColumn extends JPanel {
 				
 				ViewPrincipal.getModif().repaint();
 				ViewPrincipal.getModif().revalidate();
-				
 			}
-		
 		});
-		
 	}
 
+	
+	/********************************
+	 *        GETTERS/SETTERS		*
+	 ********************************/
 	public Column getColumn() {
 		return col;
 	}

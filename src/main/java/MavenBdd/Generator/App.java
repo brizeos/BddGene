@@ -6,21 +6,16 @@ import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import model.Column;
 import model.DaoAccess;
 import model.Database;
-import model.Table;
 import sql.ResearchSql;
 import vue.Pane;
-import vue.ViewPrincipal;
 import vue.components.Btn;
 import vue.components.ComboSelecter;
 import vue.components.Lab;
@@ -33,6 +28,7 @@ import vue.components.Lab;
  * {@link} https://www.linkedin.com/in/jonathan-pinho-44a9b914b/
  *
  */
+@SuppressWarnings("serial")
 public class App extends JFrame
 {
 	public static int width = 800, height = 640;
@@ -67,16 +63,14 @@ public class App extends JFrame
     	Pane pane = new Pane();
     	Pane pConnect = new Pane(width/10, height/5, width/10*8, height/2);
     	
-    	
     	Lab welcome = new Lab("Bienvenue sur mon générateur.");
     	welcome.setBounds(10,10,450,100);
     	welcome.setForeground(Color.white);
     	welcome.setFont(new Font("TimesRoman", Font.PLAIN, 25));
-    	
 
     	Lab l1 = new Lab("Id Bdd : ");
         Lab l2 = new Lab("Mdp Bdd : ");
-        Lab l4 = new Lab("Port de MySql : ");
+        Lab l4 = new Lab("Url:port MySql : ");
         Lab l3 = new Lab("Vous vous connecterez à la base de donnée :  ");
         
         l1.setBounds(10, 10, 140, 50);
@@ -91,13 +85,9 @@ public class App extends JFrame
         jt2.setBounds(150, 85, 200, 30);
         jt3.setBounds(150, 150, 200, 30);
         
-        
-        
         Btn b1 = new Btn("Charger les tables", 120, 200, 150, 25);
         Btn b2 = new Btn("Charger la BDD", 450, 200, 150, 25);
         
-        
-        //DefaultComboBoxModel<String> str = new DefaultComboBoxModel<String>();
         cs = new ComboSelecter(new ArrayList<String>());
         cs.setBounds(450, 150, 150, 25);
 
@@ -112,68 +102,48 @@ public class App extends JFrame
     	pConnect.add(b2);
     	pConnect.add(cs);
     	
-    	
-    	
     	pane.add(pConnect);
     	pane.add(welcome);
-    	
-    	
-    	
-    	
     	
     	frame.getContentPane().add(pane);
     	frame.repaint();
     	frame.revalidate();
     	
-    	
-    	
-    	
-    	/*
+    	/***
     	 * Action Chargement des tables
     	 */
-    
-    	
-    	
     	b1.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					cs.setModel( ResearchSql.loadTables(frame) );
-				
+					cs.setModel( ResearchSql.loadTables() );
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
 			}
-
-			
 		});
     	
     	
-    	/*
+    	/**
     	 * Action Chargement de la BDD.table
     	 */
-    	
     	b2.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					ResearchSql.loadDB();
-					
 				} catch (SQLException | IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		});
-    	
-    	
-    	
-    	
     }
     
     
-
+	/********************************
+	 *        GETTERS/SETTERS		*
+	 ********************************/
 	public  JTextField getJt1() {
 		return jt1;
 	}
@@ -184,6 +154,11 @@ public class App extends JFrame
 		return jt3;
 	}
 	
+	
+	/**
+	 * 
+	 * @return Name of the Db actually charged.
+	 */
 	public static String getDBName() {
 		return cs.getModel().getSelectedItem().toString();
 	}

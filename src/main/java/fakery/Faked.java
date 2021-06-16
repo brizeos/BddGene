@@ -24,6 +24,7 @@ import model.Column;
 import vue.components.ComboSelecter;
 import vue.components.Lab;
 
+@SuppressWarnings("serial")
 public class Faked extends JPanel{
 	
 	private Column parentCol;
@@ -32,17 +33,15 @@ public class Faked extends JPanel{
 	private static Faker f= new Faker();
 	private String data;
 	private JPanel fakeOption;
-	private int nbDone;
 	
 	/**
 	 * 
-	 * @param column Lien de communication entre la Column et le Faked
+	 * @param column Reference to Column parent.
 	 * @throws IOException 
 	 */
 	public Faked(Column column) throws IOException {
 		this.parentCol = column;
 		this.data = "";
-		this.nbDone = 0;
 		
 		if( this.parentCol.getType().matches("(?i)TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT") ) {
 			setContent("lstNumber.json");
@@ -136,6 +135,10 @@ public class Faked extends JPanel{
 	}
 
 
+	/***
+	 * Launch creation of a panel containing options if needed for current faked selection.
+	 * @return Jpanel with settings for this.parentColumn
+	 */
 	private JPanel newOption() {
 		JPanel pane = null;
 		
@@ -177,54 +180,46 @@ public class Faked extends JPanel{
 		
 	}
 	
-/*
- * GETTERS and SETTERS
- */
+	
+	/********************************
+	 *        GETTERS/SETTERS		*
+	 ********************************/
 	public ComboSelecter getFtType() {
 		return ftType;
 	}
-
 
 	public void setFtType(ComboSelecter ftType) {
 		this.ftType = ftType;
 	}
 
-
 	public ComboSelecter getFtSec() {
 		return ftSec;
 	}
-
 
 	public void setFtSec(ComboSelecter ftSec) {
 		this.ftSec = ftSec;
 	}
 
-
 	public String getData() {
 		return data;
 	}
-
 
 	public void setData(String data) {
 		this.data = data;
 		this.parentCol.setData(data);
 	}
 
-
 	public JPanel getFakeOption() {
 		return fakeOption;
 	}
-
 
 	public void setFakeOption(JPanel fakeOption) {
 		this.fakeOption = fakeOption;
 	}
 
-
 	public static Faker getF() {
 		return f;
 	}
-
 
 	public static void setF(Faker f) {
 		Faked.f = f;
@@ -233,6 +228,7 @@ public class Faked extends JPanel{
 	public void setparentCol(Column p) {
 		this.parentCol = p;
 	}
+	
 	public Column getParentCol() {
 		return parentCol;
 	}

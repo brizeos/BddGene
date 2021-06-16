@@ -8,7 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,8 +19,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
-
 import MavenBdd.Generator.App;
 import MavenBdd.Generator.utils;
 import model.Column;
@@ -31,6 +28,7 @@ import vue.components.Btn;
 import vue.components.DivColumn;
 import vue.components.Lab;
 
+@SuppressWarnings("serial")
 public class Pane extends JPanel {
 
 	public static Table tableSelected = null;
@@ -41,8 +39,7 @@ public class Pane extends JPanel {
 	private JButton okay;
 	private Pane paneNav;
 	private Btn btnDeco;
-	private Btn btnNext, truncate;
-	private Pane paneRelation;
+	private Btn btnNext;
 	
 	/**
 	 * ******************************************
@@ -276,11 +273,9 @@ public class Pane extends JPanel {
 	
 	private void LoadDiv() {
 		removeAll();
-		
-		
 		if(tableSelected != null) {
-			add(tableSelected.getRelationModel());
-		
+			add(tableSelected.getNbJft());
+			
 			for(Column c : tableSelected.getLstColumn()) {
 				if( !(c.getIsConstrained()) && !(c.getIsPrimary()) ) {
 					DivColumn j = new DivColumn(c);

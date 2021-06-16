@@ -1,16 +1,22 @@
 package fakery;
 
 import java.awt.Label;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vue.components.TCustom;
 
+@SuppressWarnings("serial")
 public class FakedTextOption extends FakeModel{
 	
 	private TCustom optOne, optTwo;
 
 	//private ComboSelecter opt1 = new ComboSelecter( null );
 
+	/***
+	 * 
+	 * @param fake Reference to this.faked parent.
+	 */
 	public FakedTextOption(Faked fake)  {
 		super(fake);
 		this.optOne = new TCustom(); 
@@ -19,9 +25,9 @@ public class FakedTextOption extends FakeModel{
 		this.resetAll();
 	}
 	
-	/***
-	 * 
-	 * @return A new String with the FakedData generated.
+	/**
+	 * Edit data value in this.faked
+	 * @throws SQLException 
 	 */
 	public void Launch() {
 		String str ="";		
@@ -107,7 +113,7 @@ public class FakedTextOption extends FakeModel{
 
 
 	/**
-	 * Reset options panel to configure the new Faked data.
+	 * Reload content
 	 */
 	public void resetAll() {
 		

@@ -13,6 +13,7 @@ import com.github.javafaker.Faker;
 import vue.components.Lab;
 import vue.components.TCustom;
 
+@SuppressWarnings("serial")
 public abstract class FakeModel extends JPanel {
 
 	public static Faker f = new Faker();
@@ -22,25 +23,21 @@ public abstract class FakeModel extends JPanel {
 	public Lab noOpt = null;
 	private TCustom optOne = null, optTwo = null, optThree = null;
 	
-
+	/***
+	 * 
+	 * @param fake Reference to this.faked parent.
+	 */
 	public FakeModel(Faked fake) {
-//		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setPreferredSize(new Dimension(450, 350));
 		
 		this.noOpt = new Lab("No options.");
 		this.faked = fake;
 		this.ls = new ArrayList<Component>();
 		
-		
-		
-		
-		
 	}
 	
 	/**
-	 * 
-	 * @param lsStr List of parameters to use in Faker command line
-	 * @return String :  Generated data
+	 * Edit data value in this.faked
 	 * @throws SQLException 
 	 */
 	public abstract void Launch() throws SQLException;
@@ -51,31 +48,10 @@ public abstract class FakeModel extends JPanel {
 	public abstract void resetAll();
 	
 	
-	/**
-	 * Reset options panel to configure the new Faked data.
-	 */
-	public void addAll() {
-		
-		for(Component c : this.ls) {
-			JPanel p = new JPanel();
-			p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-			p.add(c);
-			this.add(p);
-		}
-	}
 
-	
-	/*
-	 * Getters/Setters
-	 */
-	
-	/**
-	 * Check if there are options.
-	 * @return Boolean
-	 */
-	public boolean haveOptions() {
-		return this.getComponent(0).equals(this.noOpt);
-	}
+	/********************************
+	 *        GETTERS/SETTERS		*
+	 ********************************/
 	
 	public int getMeth() {
 		return meth;
@@ -125,6 +101,9 @@ public abstract class FakeModel extends JPanel {
 		this.ls = ls;
 	}
 	
+	
+	
+	
 	public ArrayList<Object> checkParameters(){
 		ArrayList<Object> ls = new ArrayList<Object>();
 		
@@ -136,24 +115,23 @@ public abstract class FakeModel extends JPanel {
 		
 	}
 	
-//	private ArrayList<TCustom> returnAllParams(){
-//		ArrayList<TCustom> ls = new ArrayList<TCustom>();
-//		
-//		if (this.getOpt1() != null) {
-//			ls.add(this.optOne);
-//		}
-//		if (this.getOpt2() != null) {
-//			ls.add(this.optTwo);
-//		}
-//		if (this.getOpt3() != null) {
-//			ls.add(this.optThree);
-//		}
-//		return ls;
-//		
-//		
-//	}
+	public boolean haveOptions() {
+		return this.getComponent(0).equals(this.noOpt);
+	}
 	
-
+	/**
+	 * Reset options panel to configure the new Faked data.
+	 */
+	public void addAll() {
+		
+		for(Component c : this.ls) {
+			JPanel p = new JPanel();
+			p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
+			p.add(c);
+			this.add(p);
+		}
+	}
+	
 }
 
 

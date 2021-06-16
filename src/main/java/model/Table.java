@@ -1,59 +1,90 @@
 package model;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import relation.RelationModel;
 
-import vue.Pane;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
+
+/***
+ * @author Brizeos
+ * {@link} https://www.linkedin.com/in/jonathan-pinho-44a9b914b/
+ */
 public class Table {
 
 	private String tableName;
 	private ArrayList<Column> lstColumn;
-	private boolean isConstrained, leveled, done;
+	private boolean isConstrained;
+	private boolean leveled; 
+	private boolean done;
 	private int nb;
-	
-	private HashMap<String, String> linkedTable;
 	private int nbDone;
-	private RelationModel relationPane;
+	private JTextField nbJft;
 	
+	/***
+	* Key 	: 	String "this.column.name" of this table</br>
+	* Value : 	String "table.column" of the constrained column passed in key>
+	*/
+	private HashMap<String, String> linkedTable;
+	
+	/***
+	 *	Default constructor.
+	 */
 	public Table() {
+		
 		super();
+		
 		this.lstColumn = new ArrayList<Column>();
-		this.leveled = false;
-		this.isConstrained = false;
-		this.setDone(false);
-		this.linkedTable = new HashMap<String, String>();
+		this.leveled = false;								// True if the table doesn't have constraints in the Database ArrayList.
+		this.isConstrained = false;							// True if this table has a contrained column
+		this.done = false;									// True if this table is done.
+		this.linkedTable = new HashMap<String, String>();	
+		this.nbDone = 0;									// Increment each time this table is generated.
+		this.nb = 10; 										// Generation table Iteration.
+		this.nbJft = new JTextField(4);
+		
 		/**
-		 * Fields about Iterations
+		 * Listener to change this.nb value.
 		 */
-		this.nbDone = 0;
-		this.nb = 10; //TODO zero
+		this.nbJft.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				changedUpdate(e);
+			}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				changedUpdate(e);				
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				try {
+					nb = Integer.parseInt( e.getDocument().getText(0, e.getDocument().getLength()) );
+				} catch (NumberFormatException | BadLocationException e1) {
+					e1.printStackTrace();
+					nb = 10;
+				}
+				
+			}
+		});
 		
-		
-		
-		this.relationPane = new RelationModel(this);
-		
-		
-		//TODO relationPane : charger les options
 	}
 	
-	public void increment() {
-		this.nbDone ++;
-		if (this.nbDone >= this.nb ) {
-			this.setDone(true);
-			
-		}
-		
+	
+	/********************************
+	 *        GETTERS/SETTERS		*
+	 ********************************/
+	
+	public JTextField getNbJft() {
+		return nbJft;
 	}
-	
-	
+
+	public void setNbJft(JTextField nbJft) {
+		this.nbJft = nbJft;
+	}
+
 	public String getTableName() {
 		return tableName;
 	}
@@ -74,50 +105,29 @@ public class Table {
 		return isConstrained;
 	}
 
-
-
-
 	public void setConstrained(boolean isConstrained) {
 		this.isConstrained = isConstrained;
 	}
-
-
-
 
 	public boolean isLeveled() {
 		return leveled;
 	}
 
-
-
-
 	public void setLeveled(boolean leveled) {
 		this.leveled = leveled;
 	}
-
-
-
 
 	public boolean isDone() {
 		return done;
 	}
 
-
-
-
 	public void setDone(boolean done) {
 		this.done = done;
 	}
 
-
-
-
 	public String toString() {
 		return this.getTableName();
 	}
-
-
-
 
 	public int getNb() {
 		return this.nb;
@@ -126,23 +136,35 @@ public class Table {
 		this.nb = nb;
 	}
 
-
-
-
 	public HashMap<String, String> getLinkedTable() {
 		return linkedTable;
 	}
-
-
-
 
 	public void setLinkedTable(HashMap<String, String> linkedTable) {
 		this.linkedTable = linkedTable;
 	}
 
+	/*************
+	 *  Methods	 *
+	 *************/
+	
+	
+	
+	/***
+	 * Increment a counter to check generation iteration.
+	 * Set done true if iteration are equals to number of iteration ask by user.
+	 */
+	public void increment() {
+		this.nbDone ++;
+		if (this.nbDone >= this.nb ) {
+			this.setDone(true);
+		}
+	}
 
-
-
+	/**
+	 * 
+	 * @return true if all column has all primary key before this table in the Arraylist of the database. 
+	 */
 	public boolean isAllLeveled() {
 		for (Column c : this.lstColumn) {
 			if(!c.isLeveled()) 
@@ -151,17 +173,16 @@ public class Table {
 		return true;
 	}
 	
+	
+	/**
+	 * 
+	 * @param str String key of column to check.
+	 * @return True if there a key with this value.
+	 */
 	public boolean thereIsThisConstraint(String str) {
-		
-		if(linkedTable.containsKey(str))
+		if(linkedTable.containsKey(str)) {
 			return true;
-
+		}
 		return false;
 	}
-
-	public RelationModel getRelationModel() {
-		
-		return this.relationPane;
-	}
-
 }

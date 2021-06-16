@@ -8,23 +8,24 @@ import javax.swing.JPanel;
 import MavenBdd.Generator.App;
 import model.Column;
 
+@SuppressWarnings("serial")
 public class ViewPrincipal extends JPanel {
 	
 	private static Pane content;
 	private static Pane lateral;
 	private static Pane modif;
 	
+	/***
+	 * Default view after connection.
+	 */
 	public ViewPrincipal() {
 		super();
 		
 		App.frame.setBounds(0, 0, 1900, 980);
-//		App.db.launchAllRelationModel();
-		
 		
 		this.setBackground(Color.DARK_GRAY);
 		setBounds(0, 0, 1900, 950);
 		setLayout(null);
-		
 		
 		lateral = new Pane(0, 0, 450, 950, App.db);
 		lateral.setBackground(Color.blue);
@@ -33,12 +34,9 @@ public class ViewPrincipal extends JPanel {
 		modif = new Pane(400, 300, 500, 500, new Column());
 		modif.setBackground(Color.white);
 		
-		
 		add(lateral);
 		add(content);
 		add(modif);
-		
-		
 	}
 
 	public static Pane getContent() {
@@ -64,5 +62,4 @@ public class ViewPrincipal extends JPanel {
 	public static void setModif(Pane modif) {
 		ViewPrincipal.modif = modif;
 	}
-	
 }

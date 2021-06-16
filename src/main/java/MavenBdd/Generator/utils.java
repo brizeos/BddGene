@@ -1,28 +1,20 @@
 package MavenBdd.Generator;
 
-import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
 
-import javax.swing.JPanel;
-
-import fakery.FakeModel;
-import fakery.Faked;
-import model.Column;
-import model.Database;
 import model.Table;
 import sql.ResearchSql;
-import vue.ViewPrincipal;
 
+/***
+ * @author Brizeos
+ * {@link} https://www.linkedin.com/in/jonathan-pinho-44a9b914b/
+ */
 public class utils {
 
-	
-
-	
+	/***
+	 * Lauch Generation of all tables.
+	 * @throws SQLException
+	 */
 	public static void startGeneration() throws SQLException {
 
 		App.db.getLstTable().forEach((Table table) -> {
@@ -36,20 +28,14 @@ public class utils {
 			}
 		});
 		
-		
-		//ResearchSql.recurTable( App.db.getLstTable().get(0) );
-//		for(int i= 0 ; i<App.db.getLstTable().size() ; i++) {
-//			if( db.getLstTable().indexOf(t) < db.getLstTable().size() ) {
-//				insertSql(t);
-//				t.setDone(true);
-//				recurTable(db.getLstTable().get( db.getLstTable().indexOf(t)+1 ) );
-//			}
-//		}
-	}	
-	
+		System.out.println("Done!");
 
-	
-	
+	}	
+
+	/***
+	 * @param str Table name.
+	 * @return	Table with name in parameter
+	 */
 	public static Table returnTable(String str) {
 		
 		for (Table t : App.db.getLstTable()) {

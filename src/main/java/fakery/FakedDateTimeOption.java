@@ -2,28 +2,35 @@ package fakery;
 
 import java.awt.Label;
 import java.sql.Date;
-import java.time.*;
-import java.util.ArrayList;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 import vue.components.TCustom;
 
+@SuppressWarnings("serial")
 public class FakedDateTimeOption extends FakeModel {
 
-	private TCustom optOne, optTwo, optThree;
+	private TCustom optOne, optTwo;
 
+	/***
+	 * 
+	 * @param fake Reference to this.faked parent.
+	 */
 	public FakedDateTimeOption(Faked fake) {
 		super(fake);
 		this.optOne = new TCustom(); 
 		this.optTwo = new TCustom();
-		this.optThree = new TCustom();
 		this.resetAll();
 	}
 
-	
+	/**
+	 * Edit data value in this.faked
+	 * @throws SQLException 
+	 */
 	@Override
 	public void Launch() {
 		LocalDate str = null;
-		ArrayList<Object> lsStr = this.checkParameters();
 		String dateFrom = "2001-01-01";   	//lsStr.get(0);
 		String dateTo = "2010-12-30";    	//lsStr.get(1);
 		switch (this.faked.getFtSec().getSelectedItem().toString().replaceAll("\"", "")) {
@@ -35,6 +42,9 @@ public class FakedDateTimeOption extends FakeModel {
 		getFaked().setData(str.toString());
 	}
 
+	/**
+	 * Reload content
+	 */
 	@Override
 	public void resetAll() {
 		this.removeAll();

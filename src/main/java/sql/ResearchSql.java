@@ -13,31 +13,36 @@ import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 
 import MavenBdd.Generator.App;
-import MavenBdd.Generator.utils;
 import fakery.FakeModel;
 import fakery.Faked;
 import model.Column;
 import model.DaoAccess;
 import model.Database;
 import model.Table;
-import relation.RelationModel;
 import vue.ViewPrincipal;
 
 
-
+/***
+ * @author Brizeos
+ * {@link} https://www.linkedin.com/in/jonathan-pinho-44a9b914b/
+ */
 public class ResearchSql {
 
-	
-	private static String sql4;
-	public static DefaultComboBoxModel<String> loadTables(App app) throws SQLException {
+	/***
+	 * Load Table names in the ComboSelecter in connection Panel.</br>
+	 * Use JTextfields value returned by user in connection panel.
+	 * @return	ComboBoxModel who contains all table return by MySql Query
+	 * @throws SQLException
+	 */
+	public static DefaultComboBoxModel<String> loadTables() throws SQLException {
 		
 		String sql = "SELECT DISTINCT `TABLE_SCHEMA` FROM `TABLES` WHERE `TABLE_TYPE`='BASE TABLE' AND `TABLE_SCHEMA` NOT IN ('mysql', 'performance_schema', 'sys', 'syscom');";
 		ResultSet rs = null;
-		DefaultComboBoxModel<String> str = new DefaultComboBoxModel<String>();
+		DefaultComboBoxModel<String> dcm = new DefaultComboBoxModel<String>();
     	
-    	String login = app.getJt1().getText();
-    	String mdp = app.getJt2().getText();
-    	String url = "localhost:"+ app.getJt3().getText();
+    	String login = App.frame.getJt1().getText();
+    	String mdp = App.frame.getJt2().getText();
+    	String url = App.frame.getJt3().getText();
     	
     	App.dao = new DaoAccess(url, "information_schema", login, mdp, null);
     	
@@ -46,27 +51,32 @@ public class ResearchSql {
     	App.dao.setPreparedStatement(sql);
     	rs = App.dao.getPreparedStatement().executeQuery();
     	while(rs.next()) {
-    		str.addElement(rs.getString(1));
-    
+    		dcm.addElement(rs.getString(1));
     	}
     	App.dao.disconnect();
  
-    	return str;
+    	return dcm;
     	
     }
 	
-	
+	/***
+	 * Load database selected by user and show the ViewPrincipal.
+	 * @throws SQLException
+	 * @throws IOException
+	 */
 	public static void loadDB() throws SQLException, IOException {
 		
+		@SuppressWarnings("unused")
 		int i = 0, j = 0;
-		String sql = "SELECT DISTINCT `TABLE_NAME` FROM `TABLES` WHERE `TABLE_SCHEMA` = ?";
+		String sqlQueryDistinctTable = "SELECT DISTINCT `TABLE_NAME` FROM `TABLES` WHERE `TABLE_SCHEMA` = ?";
+		String sqlQueryAllColumns = "SELECT * FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?;";
 		
 		ResultSet rs = null;
 		App.db.setName(App.cs.getModel().getSelectedItem().toString());
 		
 		App.dao.connect();
     	
-		App.dao.setPreparedStatement(sql);
+		App.dao.setPreparedStatement(sqlQueryDistinctTable);
 		App.dao.getPreparedStatement().setString(1, App.cs.getModel().getSelectedItem().toString());
     	
     	rs = App.dao.getPreparedStatement().executeQuery();
@@ -81,10 +91,7 @@ public class ResearchSql {
     		App.db.getLstTable().get(i).setTableName(rs.getString("TABLE_NAME"));
     		App.db.getLstTable().get(i).setLstColumn(new ArrayList<Column>());
     		
-
-    		
-    		String sql2 = "SELECT * FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?;";
-    		App.dao.setPreparedStatement(sql2);
+    		App.dao.setPreparedStatement(sqlQueryAllColumns);
     		App.dao.getPreparedStatement().setString(1, App.cs.getModel().getSelectedItem().toString());
     		App.dao.getPreparedStatement().setString(2, rs.getString("TABLE_NAME"));
     		
@@ -98,32 +105,25 @@ public class ResearchSql {
 												    					(rsBis.getString("COLUMN_KEY").equals("PRI") && rsBis.getString("COLUMN_KEY") != null? true : false),
 												    					((rsBis.getString("IS_NULLABLE").equals("YES") ? true : false)),
 												    					App.db.getLstTable().get(i) ) );
-
-	    	
-    			
-	    		
     			j++;
     		}
-    		
-    		//System.out.println(App.db.getLstTable().get(i).getTableName() + "   " + App.db.getLstTable().get(i).getRelationModel().getRelationMap().size());
-    		if(App.db.getLstTable().get(i).getRelationModel().getRelationMap().size() == 0) {
-    			Column tmp = null;
-    			App.db.getLstTable().get(i).getRelationModel().getRelationMap().put("root", new RelationModel(tmp));
-    		}
-    		App.db.getLstTable().get(i).getRelationModel().reload();
-    		i++;
+
+	    	App.dao.disconnect();
+	    	App.frame.getContentPane().removeAll();
+	    	App.frame.getContentPane().add(new ViewPrincipal());
+	    	
+	    	App.frame.repaint();
+	    	App.frame.revalidate();
     	}
-    	App.dao.disconnect();
-    	App.frame.getContentPane().removeAll();
-    	App.frame.getContentPane().add(new ViewPrincipal());
-    	
-    	App.frame.repaint();
-    	App.frame.revalidate();
 	}
-
-
 	
-	
+	/***
+	 * Modify a preparedStatement with method depending on column type.
+	 * @param i			Index of the prepareStratement to modify
+	 * @param column	Column to check
+	 * @throws NumberFormatException
+	 * @throws SQLException
+	 */
 	public static void DataStatement(int i, Column column) throws NumberFormatException, SQLException {
 		Date d = Date.valueOf(LocalDate.now());
 		
@@ -160,41 +160,25 @@ public class ResearchSql {
 		}else {
 			System.out.println("Error!");
 		}
-		
-		
-	}
-
-	
-	
-	private static Database db = App.db;
-
-	public static void recurTable(Table t) throws SQLException {
-		
-		for(int i= db.getLstTable().indexOf(t) ; i<db.getLstTable().size()-1 ; i++) {
-			if( db.getLstTable().indexOf(t) < db.getLstTable().size() ) {
-				insertSql(t);
-				t.setDone(true);
-			}
-		}
 	}
 	
-				
-					
-
-
-		
+	/***
+	 * Method to launch write sequance in MySql database.
+	 * @param t Table to generate.
+	 * @throws SQLException
+	 */
+	@SuppressWarnings("unused")
 	public static void insertSql(Table t) throws SQLException {
 		
 		ArrayList<String> lsStrColNameToInsert = new ArrayList<String>(); 
 		
 		/**
-		 * Creation du début du sql selon le nombre de colonnes !(FK||Primary)
+		 * Create begining of the sqlQuery  col == (!Primary || multiPass)
 		 */
 		String sql = "INSERT INTO `"+App.getDBName()+"`.`"+t.getTableName()+"`(";
 		int nbCol = 0;
 		boolean first = true;
 		for (Column c : t.getLstColumn()) {
-//			c.carte();
 			if(!c.getIsPrimary() || c.isMultiPass() ) {
 				sql += ( first ? "" : "," ) + "`"+c.getName()+"`";
 				first = false;
@@ -205,6 +189,7 @@ public class ResearchSql {
 		
 		sql+= ") VALUES (";
 		first = true;
+		
 		
 		for (String str : lsStrColNameToInsert ) {
 			sql += ( first ? "" : "," ) + " ?";
@@ -230,8 +215,6 @@ public class ResearchSql {
 					}
 				}
 			}
-			
-//			System.out.println(App.dao.getPreparedStatement().toString());
 			
 			try {
 				App.dao.getPreparedStatement().executeUpdate();

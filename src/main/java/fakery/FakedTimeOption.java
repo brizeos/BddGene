@@ -2,20 +2,30 @@ package fakery;
 
 import java.awt.Label;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vue.components.TCustom;
 
+@SuppressWarnings("serial")
 public class FakedTimeOption extends FakeModel {
 
 	private TCustom optOne, optTwo;
 	
+	/***
+	 * 
+	 * @param fake Reference to this.faked parent.
+	 */
 	public FakedTimeOption(Faked fake) {
 		super(fake);
 		this.optOne = new TCustom(); 
 		this.optTwo = new TCustom();
 	}
 
+	/**
+	 * Edit data value in this.faked
+	 * @throws SQLException 
+	 */
 	@Override
 	public void Launch() {
 		ArrayList<Object> lsStr = this.checkParameters();
@@ -34,6 +44,9 @@ public class FakedTimeOption extends FakeModel {
 		
 	}
 
+	/**
+	 * Reload content
+	 */
 	@Override
 	public void resetAll() {
 		this.removeAll();

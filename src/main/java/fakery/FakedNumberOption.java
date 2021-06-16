@@ -9,13 +9,15 @@ import MavenBdd.Generator.App;
 import model.Column;
 import vue.components.TCustom;
 
+@SuppressWarnings("serial")
 public class FakedNumberOption extends FakeModel {
-
 	
 	private TCustom optOne, optTwo;
 
-
-
+	/***
+	 * 
+	 * @param fake Reference to this.faked parent.
+	 */
 	public FakedNumberOption(Faked fake) {
 		super(fake);
 		this.optOne = new TCustom(); 
@@ -23,16 +25,16 @@ public class FakedNumberOption extends FakeModel {
 		this.resetAll();
 	}
 
-	
-	
-	
-	
-
+	/**
+	 * Edit data value in this.faked
+	 * @throws SQLException 
+	 */
 	@Override
 	public void Launch() throws SQLException {
 		int str = 0;		
 		ArrayList<Object> lsStr = this.checkParameters();
 		
+		//If this column parent is constrained.
 		if(this.getFaked().getParentCol().getIsConstrained()) {
 			this.getFaked().setData( String.valueOf( searchForConstraint(this.faked.getParentCol())) );
 		}else {
@@ -54,10 +56,14 @@ public class FakedNumberOption extends FakeModel {
 	}
 
 
-	
+	/***
+	 * Search in database value of a constrained column.
+	 * @param c Column to import a primary key
+	 * @return Value of referenced column.
+	 * @throws SQLException
+	 */
 	private int searchForConstraint(Column c) throws SQLException {
 		int i = 0;
-	//TODO GERER LA RECUPERATION DE CLé
 		
 		String sql ="Select COUNT(`"+ c.getTable().getLinkedTable().get(c.getName()).substring( c.getTable().getLinkedTable().get( c.getName()).indexOf(".")+1 ) +"`)"
 				+" from `" +c.getTable().getLinkedTable().get(c.getName()).substring(0, c.getTable().getLinkedTable().get(c.getName()).indexOf("."))+ "`;";
@@ -69,15 +75,12 @@ public class FakedNumberOption extends FakeModel {
 		while (rs.next())
 			i = f.number().numberBetween(1, rs.getInt(1));
 		
-		
 		return i;
 	}
 
-
-
-
-
-
+	/**
+	 * Reload content
+	 */
 	@Override
 	public void resetAll() {
 		this.removeAll();

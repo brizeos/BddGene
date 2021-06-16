@@ -5,6 +5,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/***
+ * 
+ * @author Anthony Plays
+ * {@link} https://www.linkedin.com/in/anthony-plays-b61987206/
+ *
+ */
 public class DaoAccess{
 
 	private String				strClassName = "com.mysql.cj.jdbc.Driver";
@@ -12,13 +18,21 @@ public class DaoAccess{
 	private String				local;
 	private String				login;
 	private String				mdp;
-	
+	@SuppressWarnings("unused")
 	private String				driver;
 	
 	private PreparedStatement	prs, prs2;
 	private Connection			conn;
 	
-	// Set the constructor of DAOAccess
+	/***
+	 * 
+	 * @param url 		Url to MySql. by default this is "localhost"
+	 * @param nomBDD	Database to use. In first time this is "information_schema". We can change this with a method. 
+	 *		 @see model.DaoAccess.changeBdd
+	 * @param login		Login with permission to the DB to fill (Write) and "information_schema" (Read-only)
+	 * @param mdp		Password
+	 * @param driver	Not used.
+	 */
 	public DaoAccess(String url, String nomBDD,String login,String mdp, String driver) {
 		this.login=login;
 		this.mdp=mdp;
@@ -27,6 +41,9 @@ public class DaoAccess{
 		this.ur = "jdbc:mysql://" + url + "/" + nomBDD + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
 	}
 	
+	/**
+	 * Method to connected DaoAccess Object to MySql
+	 */
 	public void connect()
 	{
 		try { // try for connexion to database
@@ -43,6 +60,9 @@ public class DaoAccess{
 		}
 	}
 	
+	/***
+	 * 	Method to disconnected DaoAccess Object from MySql
+	 */
 	public void disconnect()
 	{
 		try 
@@ -55,6 +75,10 @@ public class DaoAccess{
 		}	
 	}
 		
+	/**
+	 * Set the query to the DaoAccess object.
+	 * @param quary String containing the Sql Query.
+	 */
 	public void setPreparedStatement(String quary)
 	{
 		try {
@@ -65,11 +89,20 @@ public class DaoAccess{
 		}
 	}
 	
+	/**
+	 * 
+	 * @return The Sql Query actually set in the DaoAccess object.
+	 */
 	public PreparedStatement getPreparedStatement()
 	{
 		return prs;
 	}
 	
+	
+	/***
+	 * Set a second query to the DaoAccess object.
+	 * @param query String containing the Sql Query.
+	 */
 	public void setSecond(String query) {
 		try {
 			this.prs2 = conn.prepareStatement(query);
@@ -79,15 +112,24 @@ public class DaoAccess{
 		}
 	}
 	
+	/***
+	 * 
+	 * @return The Sql Query actually set in the second DaoAccess object.
+	 */
 	public PreparedStatement getSecond()
 	{
 		return prs2;
 	}
 	
+	
+	/***
+	 * 
+	 * @param str Change database used in the DaoAccess object.
+	 */
 	public void changeBdd(String str) {
 		try {
 			this.ur = "jdbc:mysql://" + this.local + "/" + str + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
-			this.conn = this.conn = DriverManager.getConnection(this.ur,this.login,this.mdp);
+			this.conn = DriverManager.getConnection(this.ur,this.login,this.mdp);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

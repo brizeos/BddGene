@@ -1,14 +1,20 @@
 package fakery;
 
 import java.awt.Label;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vue.components.TCustom;
 
+@SuppressWarnings("serial")
 public class FakedDoubleOption extends FakeModel{
 
 	private TCustom optOne, optTwo, optThree;
 	
+	/***
+	 * 
+	 * @param fake Reference to this.faked parent.
+	 */
 	public FakedDoubleOption(Faked fake) {
 		super(fake);
 		this.optOne = new TCustom(); 
@@ -19,6 +25,10 @@ public class FakedDoubleOption extends FakeModel{
 		
 	}
 
+	/**
+	 * Edit data value in this.faked
+	 * @throws SQLException 
+	 */
 	@Override
 	public void Launch() {
 		double str = 0;		
@@ -33,6 +43,9 @@ public class FakedDoubleOption extends FakeModel{
 		getFaked().setData(String.valueOf( str ));
 	}
 
+	/**
+	 * Reload content
+	 */
 	@Override
 	public void resetAll() {
 		this.removeAll();
