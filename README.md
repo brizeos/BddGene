@@ -2,9 +2,9 @@
 Mon générateur de données SGBDR semi-automatique.
 
 Descriptif:
-   Creation d'un logiciel en JAVA qui permettra la recuperation d'une 
+   Création d'un logiciel en JAVA qui permettra la récuperation d'une 
 structure de base de données implémentée pour lui ajouter un jeu de
-données fictif selon les paramètres décidé par l'utilisateur.
+données fictif selon les paramètres décidés par l'utilisateur.
 
    La librairie Faker est utilisée pour la génération aléatoire au 
 travers des différents objets dans le package "Fakery".
