@@ -1,11 +1,15 @@
 package vue;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import javax.swing.JPanel;
@@ -83,7 +87,7 @@ public class LateralTree extends JPanel {
 		add(this.nbRestant);
 		
 		this.btnDeco = new Btn("Déconnexion", 0, 0, (wx-80)/2, 80);
-		this.btnNext = new Btn("Suivant", (wx-80)/2, 0, (wx-80)/2, 80);
+		this.btnNext = new Btn("Générer", (wx-80)/2, 0, (wx-80)/2, 80);
 
 		this.btnNext.addMouseListener(new MouseAdapter() {
 			
@@ -94,7 +98,13 @@ public class LateralTree extends JPanel {
 					App.getDao().connect();
 					utils.startGeneration();
 					App.getDao().disconnect();
-				} catch (SQLException e1) {
+					
+					Desktop desktop = java.awt.Desktop.getDesktop();
+					URI oURL = new URI("http://localhost/phpmyadmin/db_structure.php?server=1&db="+App.getDBName());
+					desktop.browse(oURL);
+					
+				
+				} catch (SQLException | URISyntaxException | IOException e1) {
 					e1.printStackTrace();
 				}
 			}

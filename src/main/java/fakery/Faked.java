@@ -68,9 +68,9 @@ public class Faked extends JPanel{
 
 	@SuppressWarnings("unchecked")
 	private void setContent(String string) throws FileNotFoundException {
-		
-		URL url = getClass().getResource("/"+string);
-		InputStream is = new FileInputStream(url.getPath());
+//		URL url = getClass().getResource("/ressources/"+string);
+//		InputStream is = new FileInputStream(url.getPath());
+		InputStream is = getClass().getResourceAsStream("/ressources/"+string);
 		JsonReader jr = Json.createReader(is);
 		JsonObject empObj = jr.readObject();
         jr.close();
