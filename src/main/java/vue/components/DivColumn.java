@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import model.Column;
-import vue.Pane;
 import vue.ViewPrincipal;
 
 @SuppressWarnings("serial")
@@ -27,7 +26,7 @@ public class DivColumn extends JPanel {
 		setLayout(new FlowLayout());
 		setPreferredSize(new Dimension(800, 80));
 		setMaximumSize(new Dimension(800, 80));
-		setBackground(Color.green);
+		setBackground(Color.darkGray);
 		
 		this.col = column;
 		
@@ -46,8 +45,8 @@ public class DivColumn extends JPanel {
 				ViewPrincipal.getModif().setVisible(true);
 				ViewPrincipal.getModif().setEnabled(true);
 				
-				Pane.setColumn(col);
-				Pane.LoadCol();
+				ViewPrincipal.getModif().setColumn(col);
+				ViewPrincipal.getModif().LoadCol();
 				
 				ViewPrincipal.getModif().repaint();
 				ViewPrincipal.getModif().revalidate();

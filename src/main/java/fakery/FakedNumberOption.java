@@ -68,9 +68,9 @@ public class FakedNumberOption extends FakeModel {
 		String sql ="Select COUNT(`"+ c.getTable().getLinkedTable().get(c.getName()).substring( c.getTable().getLinkedTable().get( c.getName()).indexOf(".")+1 ) +"`)"
 				+" from `" +c.getTable().getLinkedTable().get(c.getName()).substring(0, c.getTable().getLinkedTable().get(c.getName()).indexOf("."))+ "`;";
 		
-		App.dao.setSecond(sql);
+		App.getDao().setSecond(sql);
 		
-		ResultSet rs = App.dao.getSecond().executeQuery();
+		ResultSet rs = App.getDao().getSecond().executeQuery();
 		
 		while (rs.next())
 			i = f.number().numberBetween(1, rs.getInt(1));

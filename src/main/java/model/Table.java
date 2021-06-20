@@ -8,6 +8,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
+import vue.components.TCustom;
+
 
 /***
  * @author Brizeos
@@ -22,7 +24,7 @@ public class Table {
 	private boolean done;
 	private int nb;
 	private int nbDone;
-	private JTextField nbJft;
+	private TCustom nbJft;
 	
 	/***
 	* Key 	: 	String "this.column.name" of this table</br>
@@ -43,8 +45,8 @@ public class Table {
 		this.done = false;									// True if this table is done.
 		this.linkedTable = new HashMap<String, String>();	
 		this.nbDone = 0;									// Increment each time this table is generated.
-		this.nb = 10; 										// Generation table Iteration.
-		this.nbJft = new JTextField(4);
+		this.nb = 100; 										// Generation table Iteration.
+		this.nbJft = new TCustom(4);
 		
 		/**
 		 * Listener to change this.nb value.
@@ -64,7 +66,7 @@ public class Table {
 					nb = Integer.parseInt( e.getDocument().getText(0, e.getDocument().getLength()) );
 				} catch (NumberFormatException | BadLocationException e1) {
 					e1.printStackTrace();
-					nb = 10;
+					nb = 100;
 				}
 				
 			}
@@ -77,11 +79,11 @@ public class Table {
 	 *        GETTERS/SETTERS		*
 	 ********************************/
 	
-	public JTextField getNbJft() {
+	public TCustom getNbJft() {
 		return nbJft;
 	}
 
-	public void setNbJft(JTextField nbJft) {
+	public void setNbJft(TCustom nbJft) {
 		this.nbJft = nbJft;
 	}
 
@@ -184,5 +186,14 @@ public class Table {
 			return true;
 		}
 		return false;
+	}
+	
+	public Column getThisColumn(String str) {
+		for (Column column : lstColumn) {
+			if(column.getName().equals(str)){
+				return column;
+			}
+		}
+		return null;
 	}
 }

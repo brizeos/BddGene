@@ -21,7 +21,7 @@ public class DaoAccess{
 	@SuppressWarnings("unused")
 	private String				driver;
 	
-	private PreparedStatement	prs, prs2;
+	private PreparedStatement	prs, prs2, prs3;
 	private Connection			conn;
 	
 	/***
@@ -37,9 +37,10 @@ public class DaoAccess{
 		this.login=login;
 		this.mdp=mdp;
 		this.driver=driver;
-		this.local = url;
-		this.ur = "jdbc:mysql://" + url + "/" + nomBDD + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
-	}
+		this.local = "127.0.0.1:"+url;
+		this.ur = "jdbc:mysql://" + this.local + "/" + nomBDD + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+	
+	}	
 	
 	/**
 	 * Method to connected DaoAccess Object to MySql
@@ -122,6 +123,20 @@ public class DaoAccess{
 	}
 	
 	
+	public PreparedStatement getTri() {
+		return prs3;
+		
+	}
+	
+	public void setTri(String quary)
+	{
+		try {
+			this.prs3 = conn.prepareStatement(quary);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/***
 	 * 
 	 * @param str Change database used in the DaoAccess object.
@@ -135,5 +150,6 @@ public class DaoAccess{
 			e.printStackTrace();
 		}
 	}
+
 
 }

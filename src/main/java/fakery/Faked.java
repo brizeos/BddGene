@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 
 import com.github.javafaker.Faker;
 
+import MavenBdd.Generator.App;
 import model.Column;
 import vue.components.ComboSelecter;
 import vue.components.Lab;
@@ -42,7 +43,7 @@ public class Faked extends JPanel{
 	public Faked(Column column) throws IOException {
 		this.parentCol = column;
 		this.data = "";
-		
+		setBackground(App.MainColor);
 		if( this.parentCol.getType().matches("(?i)TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT") ) {
 			setContent("lstNumber.json");
 		}else if(this.parentCol.getType().matches("(?i)FLOAT|DOUBLE|DECIMAL|REAL") ){
@@ -67,7 +68,8 @@ public class Faked extends JPanel{
 
 	@SuppressWarnings("unchecked")
 	private void setContent(String string) throws FileNotFoundException {
-		URL url = getClass().getResource(string);
+		
+		URL url = getClass().getResource("/"+string);
 		InputStream is = new FileInputStream(url.getPath());
 		JsonReader jr = Json.createReader(is);
 		JsonObject empObj = jr.readObject();
@@ -78,8 +80,9 @@ public class Faked extends JPanel{
          * First comboBox
          */
         JPanel type = new JPanel();
+        type.setBackground(App.MainColor);
 		type.setLayout(new BoxLayout(type, BoxLayout.LINE_AXIS));
-		Lab labType = new Lab("Content : ");
+		Lab labType = new Lab("Content : ", false);
 		labType.setBounds(10, 10, 100, 40);
 		ArrayList<String> lsStr1 = new ArrayList<String>();
 		lsStr1.addAll( (Collection<? extends String>) empObj.get("lst") );
@@ -95,9 +98,10 @@ public class Faked extends JPanel{
 		 * Second ComboBox
 		 */
 		JPanel sec = new JPanel();
+		sec.setBackground(App.MainColor);
 		HashMap<String, ArrayList<String>> lsStr2 = new HashMap<String, ArrayList<String>>();
 		lsStr2.putAll((Map<? extends String, ? extends ArrayList<String>>) empObj.get("data"));
-		Lab labSec = new Lab("Sec : ");
+		Lab labSec = new Lab("Sec : ", false);
 		this.ftSec = new ComboSelecter(lsStr2, this.ftType.getSelectedItem().toString());
 		this.ftSec.setSelectedIndex(0);
 		
@@ -110,6 +114,7 @@ public class Faked extends JPanel{
 		 * Options
 		 */
 		this.fakeOption = newOption();    
+		this.fakeOption.setBackground(App.MainColor);
 		add(this.fakeOption);	
 		
 		
@@ -142,6 +147,7 @@ public class Faked extends JPanel{
 	private JPanel newOption() {
 		JPanel pane = null;
 		
+		
 		if( this.parentCol.getType().matches("(?i)TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT") ) {
 			pane = new FakedNumberOption(this);
 			
@@ -170,7 +176,7 @@ public class Faked extends JPanel{
 			pane = new FakedTextOption(this);
 			
 		}
-		
+		pane.setBackground(App.MainColor);
 		return pane;
 	}
 	

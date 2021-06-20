@@ -1,7 +1,10 @@
 package vue.components;
 
 import java.awt.Color;
+import java.awt.Dimension;
 
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 
 @SuppressWarnings("serial")
@@ -23,4 +26,28 @@ public class Btn extends JButton {
 		setForeground(Color.white);
 		
 	}
+	
+	public Btn(String text) {
+		super(text);
+		
+		setBackground(Color.darkGray);
+		setForeground(Color.white);
+		
+	}
+	
+	
+	public Btn(Icon icon) {
+		super(icon);
+		Dimension dim = new Dimension(25, 25);
+		setMaximumSize(dim);
+		setMinimumSize(dim);
+		setPreferredSize(dim);
+		setBackground(Color.black);
+		setBorder(BorderFactory.createEmptyBorder());
+
+	}
+
+
+
+
 }

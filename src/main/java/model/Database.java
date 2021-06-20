@@ -108,7 +108,8 @@ public class Database {
 					
 					//Check how many constrained columns.
 					nbFk = this.lstTable.get(indexLST).getLinkedTable().size();
-					
+					System.out.println(this.lstTable.get(indexLST).toString());
+					System.out.println(this.lstTable.get(indexLST).getLinkedTable());
 					//Decrement each time one of this columns constraint is find since the begin of the ArrayList
 					this.lstTable.get(indexLST).getLinkedTable().forEach( (k, v) -> {
 						for(int indexBack=0 ; indexBack<indexLST ; indexBack++) {

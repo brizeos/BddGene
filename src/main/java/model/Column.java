@@ -4,6 +4,9 @@ import java.awt.Component;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
+import com.github.javafaker.Faker;
 
 import MavenBdd.Generator.App;
 import fakery.Faked;
@@ -19,6 +22,7 @@ public class Column {
 	private Faked f;
 	private Table table;
 	private String name, type, data;
+	private ArrayList<String> listPrimaryKeyLinked;
 	
 	/***
 	 * Model to build a column
@@ -45,22 +49,41 @@ public class Column {
 		this.setMultiPass(false);
 		this.setValidated(false);
 		this.setTable(table);
+		this.listPrimaryKeyLinked = new ArrayList<String>();
 		
 		
 		String str = "SELECT * FROM `KEY_COLUMN_USAGE` WHERE `TABLE_NAME`= ? AND `TABLE_SCHEMA`= ? AND `COLUMN_NAME` = ? AND `CONSTRAINT_NAME` != 'PRIMARY';";
-		App.dao.setPreparedStatement(str);
-		App.dao.getPreparedStatement().setString(1, table.getTableName());
-		App.dao.getPreparedStatement().setString(2, App.getDBName());
-		App.dao.getPreparedStatement().setString(3, this.name);
+		String sql2 = "SELECT * FROM `KEY_COLUMN_USAGE` WHERE `TABLE_NAME`= ? AND `TABLE_SCHEMA`= ? AND `CONSTRAINT_NAME` = 'PRIMARY';";
 		
-		ResultSet rs = null;
 		
-		rs = App.dao.getPreparedStatement().executeQuery();
+		App.getDao().setPreparedStatement(str);
+		App.getDao().getPreparedStatement().setString(1, table.getTableName());
+		App.getDao().getPreparedStatement().setString(2, App.getDBName());
+		App.getDao().getPreparedStatement().setString(3, this.name);
 		
+		ResultSet rs = App.getDao().getPreparedStatement().executeQuery();
+		System.out.println(this.table.getTableName()+"."+this.name);
 		while(rs.next()) {
+			
 				this.table.getLinkedTable().put(rs.getString("COLUMN_NAME"),  rs.getString("REFERENCED_TABLE_NAME")+"."+rs.getString("REFERENCED_COLUMN_NAME"));
 				this.isConstrained = true;
+				
+				
+				App.getDao().setSecond(sql2);
+				App.getDao().getSecond().setString(1, rs.getString("REFERENCED_TABLE_NAME"));
+				App.getDao().getSecond().setString(2, App.getDBName());
+				ResultSet rs2 = App.getDao().getSecond().executeQuery();
+				
+				String ref = rs.getString("REFERENCED_COLUMN_NAME");
+				
+				while(rs2.next()) {
+					if( !rs2.getString("COLUMN_NAME").equals(ref)) {
+						this.listPrimaryKeyLinked.add(rs.getString("REFERENCED_TABLE_NAME") + "." + rs2.getString("COLUMN_NAME"));
+					}
+				}
+				
 		}
+		System.out.println("Constraint: "+this.listPrimaryKeyLinked);
 		
 		if(this.isConstrained && this.isPrimary) {
 			this.multiPass = true;
@@ -146,6 +169,10 @@ public class Column {
 		this.data = data;
 	}
 
+	public ArrayList<String> getListPrimaryKeyLinked() {
+		return listPrimaryKeyLinked;
+	}
+
 	public boolean isValidated() {
 		return validated;
 	}
@@ -185,6 +212,21 @@ public class Column {
 
 	public void setMultiPass(boolean multiPass) {
 		this.multiPass = multiPass;
+	}
+	
+	public int craftSpecificKey(String ref, String main, String val, Column col) throws SQLException {
+
+		int id = Integer.parseInt(val);
+		ArrayList<Integer> listKey = new ArrayList<Integer>();
+		String sqlSpec = "SELECT `" + ref.substring(ref.indexOf(".")+1) + "` FROM `"+ref.substring(0, ref.indexOf(".")) + "` WHERE `"+ main + "` = " + id +";";
+		App.getDao().setTri(sqlSpec);
+		
+		ResultSet rs = App.getDao().getTri().executeQuery();
+		while(rs.next()) {
+			listKey.add(rs.getInt(1));
+		}
+		
+		return listKey.get( Faker.instance().number().numberBetween(0, listKey.size()-1)  );
 	}
 	
 }

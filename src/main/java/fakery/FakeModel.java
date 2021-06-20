@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import com.github.javafaker.Faker;
 
+import MavenBdd.Generator.App;
 import vue.components.Lab;
 import vue.components.TCustom;
 
@@ -29,8 +30,8 @@ public abstract class FakeModel extends JPanel {
 	 */
 	public FakeModel(Faked fake) {
 		setPreferredSize(new Dimension(450, 350));
-		
-		this.noOpt = new Lab("No options.");
+		setBackground(App.MainColor);
+		this.noOpt = new Lab("No options.", false);
 		this.faked = fake;
 		this.ls = new ArrayList<Component>();
 		
@@ -128,6 +129,7 @@ public abstract class FakeModel extends JPanel {
 			JPanel p = new JPanel();
 			p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
 			p.add(c);
+			p.setBackground(App.MainColor);
 			this.add(p);
 		}
 	}

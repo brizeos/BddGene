@@ -17,7 +17,7 @@ public class utils {
 	 */
 	public static void startGeneration() throws SQLException {
 
-		App.db.getLstTable().forEach((Table table) -> {
+		App.getDb().getLstTable().forEach((Table table) -> {
 			if(!table.isDone()) {
 				try {
 					ResearchSql.insertSql(table);
@@ -38,7 +38,7 @@ public class utils {
 	 */
 	public static Table returnTable(String str) {
 		
-		for (Table t : App.db.getLstTable()) {
+		for (Table t : App.getDb().getLstTable()) {
 			if(t.getTableName().equals(str)) {
 				return t;
 			}

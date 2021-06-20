@@ -1,5 +1,6 @@
 package vue.components;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,7 +19,10 @@ public class ComboSelecter extends JComboBox<String> {
 	 */
 	public ComboSelecter(ArrayList<String> ls) {
 		super();
-		
+		Dimension dim = new Dimension(200, 30);
+		setMaximumSize(dim);
+		setMinimumSize(dim);
+		setPreferredSize(dim);
 		DefaultComboBoxModel<String> str = new DefaultComboBoxModel<String>();
 		str.addAll(ls);
 		setModel(str);
@@ -40,6 +44,12 @@ public class ComboSelecter extends JComboBox<String> {
 		DefaultComboBoxModel<String> str = new DefaultComboBoxModel<String>();
 		str.addAll(ls);
 		setModel(str);
+		Dimension dim = new Dimension(200, 30);
+		setMaximumSize(dim);
+		setMinimumSize(dim);
+		setPreferredSize(dim);
+		repaint();
+		revalidate();
 	}
 	
 	/**
@@ -53,4 +63,5 @@ public class ComboSelecter extends JComboBox<String> {
 		
 	}
 
+	
 }

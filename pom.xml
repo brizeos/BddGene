@@ -10,19 +10,18 @@
 
   <name>Generator</name>
   <description>A simple Generator.</description>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <packaging>jar</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>15</maven.compiler.source>
+    <maven.compiler.target>15</maven.compiler.target>
   </properties>
   
   <repositories>
 	  <repository>
 	    <id>BddGenerator</id>
-	    <url>https://github.com/brizeos/BddGenerator</url>
+	    <url>https://github.com/brizeos/BddGene</url>
 	  </repository>
 	</repositories>
 
@@ -33,23 +32,22 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
+      
     </dependency>
     <dependency>
   		<groupId>com.google.code.gson</groupId>
   		<artifactId>gson</artifactId>
   		<version>2.8.7</version>
+  		<scope>provided</scope>
 	</dependency>
 	
 	<dependency>
     	<groupId>mysql</groupId>
    	 	<artifactId>mysql-connector-java</artifactId>
    	 	<version>8.0.25</version>
+   	 	<scope>import</scope>
 	</dependency>
-	<dependency>
-        <groupId>javax.json</groupId>
-        <artifactId>javax.json-api</artifactId>
-        <version>1.0</version>
-    </dependency>
+
     <dependency>
         <groupId>org.glassfish</groupId>
         <artifactId>javax.json</artifactId>
@@ -61,6 +59,7 @@
     <artifactId>javafaker</artifactId>
     <version>1.0.2</version>
 </dependency>
+
 	
 	
   </dependencies>
@@ -68,6 +67,22 @@
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
+      
+      	<plugin>
+      		<artifactId>maven-assembly-plugin</artifactId>
+      			<configuration>
+       			 	<archive>
+          				<manifest>
+            				<mainClass>MavenBdd.Generator.App</mainClass>
+          				</manifest>
+        			</archive>
+        			<descriptorRefs>
+          				<descriptorRef>jar-with-dependencies</descriptorRef>
+       				</descriptorRefs>
+      			</configuration>
+      			
+    	</plugin>
+    	
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.1.0</version>
@@ -96,6 +111,13 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
+          <configuration>
+          	<archive>
+          		<manifest>
+          			<mainClass>MavenBdd.Generator.App</mainClass>
+          		</manifest>
+          	</archive>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -107,6 +129,14 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <resources>
+    	<resource>
+        	<directory>src/main/java/fakery</directory>
+        	<includes>
+          		<include>*.json</include>
+       	 	</includes>
+      	</resource>
+    </resources>
   </build>
 
   <reporting>
