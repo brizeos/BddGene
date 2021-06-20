@@ -1,4 +1,8 @@
 
 *.drawio
 Docs/Wireframe.png
-/target/
+/target/archive-tmp
+/target/classes
+/generated-sources
+/maven-status
+/.settings
